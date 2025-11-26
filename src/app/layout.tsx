@@ -42,6 +42,14 @@ export const metadata: Metadata = {
     title: "RNDR Realm - Creative Studio Blog",
     description:
       "Insights on design, motion, and React development from RNDR Realm creative studio",
+    images: [
+      {
+        url: "/og.png",
+        width: 1200,
+        height: 630,
+        alt: "RNDR Realm - Creative Studio Blog",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
@@ -49,6 +57,7 @@ export const metadata: Metadata = {
     description:
       "Insights on design, motion, and React development from RNDR Realm creative studio",
     creator: "@rndr_realm",
+    images: ["/og.png"],
   },
   robots: {
     index: true,

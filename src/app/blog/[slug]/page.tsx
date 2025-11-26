@@ -42,11 +42,20 @@ export async function generateMetadata({
       authors: [frontMatter.author],
       tags: frontMatter.tags?.map((tag) => tag.label) || [],
       section: frontMatter.category,
+      images: [
+        {
+          url: "/og.png",
+          width: 1200,
+          height: 630,
+          alt: frontMatter.title,
+        },
+      ],
     },
     twitter: {
       card: "summary_large_image",
       title: frontMatter.title,
       description: frontMatter.description,
+      images: ["/og.png"],
     },
   };
 }

@@ -16,12 +16,21 @@ export const metadata: Metadata = {
     description:
       "Articles about motion design, React development, interactive components, and creative studio insights",
     type: "website",
+    images: [
+      {
+        url: "/og.png",
+        width: 1200,
+        height: 630,
+        alt: "RNDR Realm Blog",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Blog | RNDR Realm",
     description:
       "Articles about motion design, React development, interactive components, and creative studio insights",
+    images: ["/og.png"],
   },
 };
 
