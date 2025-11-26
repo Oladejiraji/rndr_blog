@@ -1,0 +1,167 @@
+---
+title: "Getting Started with Next.js 15 and MDX"
+description: "A comprehensive guide to building modern blogs with Next.js 15, MDX, and React Server Components"
+date: "2025-11-10"
+updated: "2025-11-12"
+author: "Your Name"
+slug: "getting-started"
+category: "the-studio"
+published: true
+tags:
+  - label: "Article"
+    iconFill: "#70BB9C"
+    textColor: "#70BB9C"
+    bgColor: "#E8F7F0"
+    type: "article"
+---
+
+# Getting Started with Next.js 15 and MDX
+
+Welcome to this sample blog post! This article demonstrates various MDX features and markdown syntax that you can use in your blog.
+
+## Introduction
+
+**MDX** allows you to use JSX in your markdown content, making it incredibly powerful for creating interactive blog posts. You can write regular markdown and seamlessly integrate React components.
+
+## Features Showcase
+
+### Text Formatting
+
+Here are some common text formatting options:
+
+- **Bold text** using `**text**`
+- _Italic text_ using `*text*`
+- **_Bold and italic_** using `***text***`
+- ~~Strikethrough~~ using `~~text~~`
+- `Inline code` using backticks
+
+### Lists
+
+#### Unordered List
+
+- First item
+- Second item
+  - Nested item 1
+  - Nested item 2
+- Third item
+
+#### Ordered List
+
+1. First step
+2. Second step
+3. Third step
+
+### Code Blocks
+
+Here's a JavaScript code example:
+
+```javascript
+// Example: React Server Component
+export default async function BlogPost({ params }) {
+  const post = await getPost(params.slug);
+
+  return (
+    <article>
+      <h1>{post.title}</h1>
+      <div>{post.content}</div>
+    </article>
+  );
+}
+```
+
+TypeScript example:
+
+```typescript
+interface BlogPost {
+  title: string;
+  description: string;
+  date: string;
+  slug: string;
+  content: string;
+}
+
+const posts: BlogPost[] = [];
+```
+
+### Blockquotes
+
+> "The only way to do great work is to love what you do."
+>
+>  Steve Jobs
+
+You can also nest blockquotes:
+
+> This is a blockquote
+>
+> > This is a nested blockquote
+> >
+> > It can contain **formatted** text too!
+
+### Links and Images
+
+Check out [Next.js documentation](https://nextjs.org/docs) for more information.
+
+Here's how you'd add an image:
+
+```markdown
+![Alt text](https://via.placeholder.com/800x400)
+```
+
+## MDX Components
+
+One of the most powerful features of MDX is the ability to use React components directly in your markdown.
+
+```jsx
+export const Highlight = ({ children, color }) => (
+  <span
+    style={{
+      backgroundColor: color,
+      borderRadius: "2px",
+      color: "#fff",
+      padding: "0.2rem",
+    }}
+  >
+    {children}
+  </span>
+);
+
+<Highlight color="#25c2a0">This is highlighted!</Highlight>;
+```
+
+### Custom Callouts
+
+You can create custom components for callouts:
+
+```jsx
+<div className="callout callout-info">
+  <strong>Info:</strong> This is an informational message.
+</div>
+
+<div className="callout callout-warning">
+  <strong>Warning:</strong> This is a warning message.
+</div>
+
+<div className="callout callout-success">
+  <strong>Success:</strong> This is a success message.
+</div>
+```
+
+## Best Practices
+
+1. **Keep frontmatter consistent** - Use the same fields across all posts
+2. **Optimize images** - Use Next.js Image component for better performance
+3. **Add metadata** - Include description and tags for SEO
+4. **Use semantic HTML** - Helps with accessibility and SEO
+5. **Test responsiveness** - Ensure your content looks good on all devices
+
+## Conclusion
+
+This sample article demonstrates the flexibility and power of MDX for creating rich, interactive blog content. You can:
+
+- Write regular markdown
+- Use React components
+- Add custom styling
+- Include code examples
+- Create interactive elements
+
+Happy blogging!
