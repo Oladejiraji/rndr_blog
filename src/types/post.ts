@@ -5,16 +5,27 @@ export type ReadingTime = {
 };
 
 export type Post = {
-  colorFeatured?: string;
+  title: string;
+  description: string;
   date: string;
   updated: string;
+  author: string;
+  slug: string;
+  category: string;
+  published: boolean;
+  tags?: {
+    label: string;
+    iconFill: string;
+    textColor: string;
+    bgColor: string;
+    type: "featured" | "article";
+  }[];
+  colorFeatured?: string;
   featured?: boolean;
   fontFeatured?: string;
   keywords?: string[];
-  slug: string;
-  subtitle: string;
+  subtitle?: string;
   seoTitle?: string;
-  title: string;
 };
 
 export type FrontMatterPost = {

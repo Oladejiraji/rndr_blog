@@ -10,6 +10,46 @@ import { BackIcon, LinkIcon, MailIcon } from "@/components/svg";
 import { MdxComponents } from "@/components/blog/mdx-components";
 import { getAllPosts } from "@/lib/mdx/server-functions";
 import BlogSpotlight from "@/provider/spotlight";
+import type { Metadata } from "next";
+import {
+  generateArticleSchema,
+  generateBreadcrumbSchema,
+} from "@/lib/seo/structured-data";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const resolvedParams = await params;
+  const post = await getFileBySlug(resolvedParams.slug);
+  const { frontMatter } = post;
+
+  const publishedTime = frontMatter.date;
+  const modifiedTime = frontMatter.updated || frontMatter.date;
+
+  return {
+    title: frontMatter.title,
+    description: frontMatter.description,
+    keywords: frontMatter.tags?.map((tag) => tag.label) || [],
+    authors: [{ name: frontMatter.author }],
+    openGraph: {
+      title: frontMatter.title,
+      description: frontMatter.description,
+      type: "article",
+      publishedTime,
+      modifiedTime,
+      authors: [frontMatter.author],
+      tags: frontMatter.tags?.map((tag) => tag.label) || [],
+      section: frontMatter.category,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: frontMatter.title,
+      description: frontMatter.description,
+    },
+  };
+}
 
 export default async function RemoteMdxPage({
   params,
@@ -20,8 +60,31 @@ export default async function RemoteMdxPage({
   const post = await getFileBySlug(resolvedParams.slug);
   const articleData = await getAllPosts();
 
+  const articleSchema = generateArticleSchema(
+    post.frontMatter,
+    post.frontMatter.readingTime.text,
+    resolvedParams.slug
+  );
+
+  const breadcrumbSchema = generateBreadcrumbSchema(
+    post.frontMatter.title,
+    resolvedParams.slug
+  );
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(articleSchema),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(breadcrumbSchema),
+        }}
+      />
       <div className="pt-10 pb-11 hidden md:block">
         <BlogSpotlight articleData={articleData} />
       </div>
