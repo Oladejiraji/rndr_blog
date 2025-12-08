@@ -214,3 +214,9 @@ h4:hover .anchor-link {
   opacity: 1;
   color: var(--accent);
 }
+
+.rive-comp canvas {
+  display: block;
+  /* width: 250px !important;
+  height: 72px !important; */
+}

@@ -1,12 +1,14 @@
 import ArticleCard from "@/components/blog/article-card";
-import { MailIcon, TwitterIcon } from "@/components/svg";
 import { Categories } from "@/lib/constants";
 import { getAllPosts } from "@/lib/mdx/server-functions";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import BlogSpotlight from "@/provider/spotlight";
 import type { Metadata } from "next";
-
+import { RiveAnimation } from "@/components/RiveAnimation";
+import { XIcon } from "@/components/svg";
+import GithubLink from "@/components/blog/links/github";
+import EmailLInk from "@/components/blog/links/email";
 export const metadata: Metadata = {
   title: "Blog",
   description:
@@ -36,12 +38,24 @@ export const metadata: Metadata = {
 
 const socialOptions = [
   {
-    icon: <TwitterIcon />,
+    icon: (
+      <RiveAnimation
+        src="/twitter.riv"
+        stateMachineName="Twitter"
+        className="w-full h-9"
+      />
+    ),
     label: "Twitter (X)",
     href: "https://x.com/rndr_realm",
   },
   {
-    icon: <MailIcon />,
+    icon: (
+      <RiveAnimation
+        src="/mail.riv"
+        stateMachineName="Mail"
+        className="w-full h-9"
+      />
+    ),
     label: "Mail",
     href: "mailto:rndrrealm@gmail.com",
   },
@@ -83,24 +97,29 @@ const Blog = async ({
               <h3 className="text-gray-600">Creative Studio</h3>
             </div>
             <div className=" md:hidden block">
-              <BlogSpotlight articleData={ArticlesData} />
+              <BlogSpotlight articleData={ArticlesData} isMobile />
             </div>
           </div>
           <div className="flex items-center gap-2">
-            {socialOptions.map((option, i) => (
-              <Link
-                key={i}
-                href={option.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center bg-gray-100 h-9 px-3.5 rounded-full gap-1"
-              >
-                {option.icon}
-                <span className="text-gray-900 font-sans text-base ">
-                  {option.label}
-                </span>
-              </Link>
-            ))}
+            <Link
+              href="https://x.com/rndr_realm"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <div className="text-gray-900 flex items-center  bg-gray-100 rounded-[30px] py-1.5 pl-2.5 pr-3.5 hover:bg-gray-200 transition-all group w-24 hover:w-33.5">
+                <div className="w-fit">
+                  <XIcon className="size-4" />
+                </div>
+                <div className="relative flex justify-end w-full">
+                  <span className="absolute left-0 text-base opacity-0 group-hover:opacity-100 transition-opacity">
+                    Open
+                  </span>
+                  <span className="text-base font-medium">Twitter</span>
+                </div>
+              </div>
+            </Link>
+            <GithubLink />
+            <EmailLInk />
           </div>
         </div>
         <div className="pt-20">

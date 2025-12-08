@@ -4,20 +4,33 @@ import SearchInput from "@/components/shared/search-input";
 import { Spotlight } from "@/components/shared/spotlight";
 import { Search } from "@/components/svg";
 import { useCommandK } from "@/hooks/useKeyboardShortcut";
+import { useIsMobile } from "@/hooks/useMediaQuery";
+import { cn } from "@/lib/utils";
 import React, { useState } from "react";
 
-const BlogSpotlight = ({ articleData }: { articleData: PostType[] }) => {
+const BlogSpotlight = ({
+  articleData,
+  isMobile = false,
+}: {
+  articleData: PostType[];
+  isMobile?: boolean;
+}) => {
   const [isOpen, setIsOpen] = useState(false);
+  const isMobileQuery = useIsMobile();
 
   // Open modal with Cmd+K (Mac) or Ctrl+K (Windows)
   useCommandK(() => setIsOpen(true));
 
-  return (
+  return isMobile === isMobileQuery ? (
     <>
       <Spotlight
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
         articleData={articleData}
+        className={cn({
+          "block md:hidden": isMobile,
+          "hidden md:block": !isMobile,
+        })}
       />
       <div className="w-full flex justify-center">
         <button className="" onClick={() => setIsOpen(true)}>
@@ -30,7 +43,7 @@ const BlogSpotlight = ({ articleData }: { articleData: PostType[] }) => {
         </button>
       </div>
     </>
-  );
+  ) : null;
 };
 
 export default BlogSpotlight;

@@ -1,9 +1,8 @@
-import React from "react";
+import React, { Fragment } from "react";
 import { ArrowRightIcon } from "../svg";
 import Link from "next/link";
 import { PostType } from "./code/types";
-import ArticleTag from "./article-tag";
-import { iconMap } from "@/lib/icon-map";
+import { TagsMaps } from "@/lib/static";
 
 interface IProps {
   article: PostType;
@@ -14,13 +13,7 @@ const ArticleCard = ({ article }: IProps) => {
     <div>
       <div className="flex items-center justify-end gap-1 pb-3">
         {article.tags.map((tag, i) => (
-          <ArticleTag
-            label={tag.label}
-            textColor={tag.textColor}
-            bgColor={tag.bgColor}
-            icon={iconMap[tag.type](tag.iconFill)}
-            key={i}
-          />
+          <Fragment key={i}>{TagsMaps[tag]}</Fragment>
         ))}
       </div>
       <Link

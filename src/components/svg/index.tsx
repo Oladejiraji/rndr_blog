@@ -181,3 +181,19 @@ export const TickIcon = () => (
     ></path>
   </svg>
 );
+
+export const XIcon = ({ className }: { className: string }) => (
+  <svg
+    className={className}
+    xmlns="http://www.w3.org/2000/svg"
+    width="48"
+    height="48"
+    fill="none"
+    viewBox="0 0 48 48"
+  >
+    <path
+      fill="#000"
+      d="M40.896 39.293 29.46 21.33 40.656 9.013a2.25 2.25 0 0 0-3.33-3.026L26.963 17.394 19.896 6.293A2.25 2.25 0 0 0 18 5.25h-9A2.25 2.25 0 0 0 7.1 8.707L18.54 26.67 7.334 38.987a2.25 2.25 0 1 0 3.33 3.026l10.37-11.407 7.067 11.102A2.25 2.25 0 0 0 30 42.75h9a2.25 2.25 0 0 0 1.897-3.458m-9.662-1.043L13.097 9.75h3.666L34.9 38.25z"
+    ></path>
+  </svg>
+);
