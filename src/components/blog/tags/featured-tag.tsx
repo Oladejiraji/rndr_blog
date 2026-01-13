@@ -21,7 +21,9 @@ const FeaturedTag = () => {
           hoverInputName="Hover"
         />
       </div>
-      <span className="text-[#5F8DBE] font-sans text-xs ">Featured</span>
+      <span className="text-[#5F8DBE] font-sans font-medium text-xs ">
+        Featured
+      </span>
     </button>
   );
 };

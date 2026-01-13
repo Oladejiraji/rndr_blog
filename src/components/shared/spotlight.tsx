@@ -53,7 +53,7 @@ function SearchContent({
           <Search />
         </div>
         <Input
-          className="rounded-t-[20px] rounded-b-[20px] md:rounded-b-none md:rounded-t-[18px] bg-[#F5F5F5] md:bg-transparent rounded-full  border-none pl-10 pr-4 py-5 h-10 md:h-16 placeholder:text-gray-1100 text-base "
+          className="rounded-t-[20px] rounded-b-[20px] md:rounded-b-none border-[red]! md:rounded-t-[18px] bg-[#F5F5F5] md:bg-transparent rounded-full  border-none pl-10 pr-4 py-5 h-10 md:h-16 placeholder:text-gray-1100 text-base "
           placeholder="Search Keywords or Blog Posts"
           value={value}
           onChange={(e) => setValue(e.target.value)}

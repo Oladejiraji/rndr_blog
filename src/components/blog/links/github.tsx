@@ -29,7 +29,7 @@ const GithubLink = () => {
           <span className="absolute left-0 text-base opacity-0 group-hover:opacity-100 transition-opacity">
             Open
           </span>
-          <span className="text-base font-medium">Github</span>
+          <span className="text-base font-medium">GitHub</span>
         </div>
       </div>
     </Link>

@@ -21,7 +21,9 @@ const ArticleTag = () => {
           hoverInputName="Hover"
         />
       </div>
-      <span className="text-[#70BB9C] font-sans text-xs ">Article</span>
+      <span className="text-[#70BB9C] font-sans font-medium text-xs ">
+        Article
+      </span>
     </button>
   );
 };

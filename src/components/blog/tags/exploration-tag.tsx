@@ -21,7 +21,9 @@ const ExplorationTag = () => {
           hoverInputName="Hover"
         />
       </div>
-      <span className="text-[#C97038] font-sans text-xs ">3D Exploration</span>
+      <span className="text-[#C97038] font-medium font-sans text-xs ">
+        3D Exploration
+      </span>
     </button>
   );
 };
