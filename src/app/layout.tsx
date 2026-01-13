@@ -32,9 +32,7 @@ export const metadata: Metadata = {
   authors: [{ name: "RNDR Realm" }],
   creator: "RNDR Realm",
   publisher: "RNDR Realm",
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
-  ),
+  metadataBase: new URL("https://rndr-blog.vercel.app"),
   openGraph: {
     type: "website",
     locale: "en_US",
