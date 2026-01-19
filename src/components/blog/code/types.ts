@@ -13,6 +13,7 @@ export interface PostType {
   slug: string;
   category: string;
   published: boolean;
+  hidden?: boolean;
   // tags: {
   //   label: string;
   //   iconFill: string;

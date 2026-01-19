@@ -22,25 +22,25 @@ export const MdxComponents = {
   ),
   h2: (props: React.HTMLAttributes<HTMLHeadingElement>) => (
     <h2
-      className="text-base md:text-lg font-semibold mb-4 mt-10 text-gray-900"
+      className="text-sm md:text-base font-semibold mb-4 mt-10 text-gray-900"
       {...props}
     />
   ),
   h3: (props: React.HTMLAttributes<HTMLHeadingElement>) => (
     <h3
-      className="text-base md:text-lg font-semibold mb-3 mt-8 text-gray-900"
+      className="text-sm md:text-base font-semibold mb-3 mt-8 text-gray-900"
       {...props}
     />
   ),
   h4: (props: React.HTMLAttributes<HTMLHeadingElement>) => (
     <h4
-      className="text-base md:text-lg font-semibold mb-3 mt-6 text-gray-900"
+      className="text-sm md:text-base font-semibold mb-3 mt-6 text-gray-900"
       {...props}
     />
   ),
   h5: (props: React.HTMLAttributes<HTMLHeadingElement>) => (
     <h5
-      className="text-base md:text-lg font-semibold mb-2 mt-4 text-gray-900"
+      className="text-sm md:text-base font-semibold mb-2 mt-4 text-gray-900"
       {...props}
     />
   ),
@@ -52,13 +52,13 @@ export const MdxComponents = {
   ),
   p: (props: React.HTMLAttributes<HTMLParagraphElement>) => (
     <p
-      className="text-sm md:text-base md:leading-6 mb-4 text-gray-700"
+      className="text-xs md:text-sm md:leading-6 mb-4 text-gray-700"
       {...props}
     />
   ),
   a: (props: React.AnchorHTMLAttributes<HTMLAnchorElement>) => (
     <a
-      className="text-sm md:text-base text-blue-600 hover:text-blue-800 underline"
+      className="text-xs md:text-sm text-blue-600 hover:text-blue-800 underline"
       {...props}
     />
   ),
@@ -70,22 +70,22 @@ export const MdxComponents = {
   ),
   ul: (props: React.HTMLAttributes<HTMLUListElement>) => (
     <ul
-      className="text-sm md:text-base list-disc list-inside mb-4 space-y-2"
+      className="text-xs md:text-sm list-disc list-inside mb-4 space-y-2"
       {...props}
     />
   ),
   ol: (props: React.OlHTMLAttributes<HTMLOListElement>) => (
     <ol
-      className="text-sm md:text-base list-decimal list-inside mb-4 space-y-2"
+      className="text-xs md:text-sm list-decimal list-inside mb-4 space-y-2"
       {...props}
     />
   ),
   li: (props: React.LiHTMLAttributes<HTMLLIElement>) => (
-    <li className="text-sm md:text-base text-gray-700" {...props} />
+    <li className="text-xs md:text-sm text-gray-700" {...props} />
   ),
   blockquote: (props: React.BlockquoteHTMLAttributes<HTMLQuoteElement>) => (
     <blockquote
-      className="text-sm md:text-base border-l-4 border-gray-300 pl-4 py-2 mb-4 italic text-gray-700"
+      className="text-xs md:text-sm border-l-4 border-gray-300 pl-4 py-2 mb-4 italic text-gray-700"
       {...props}
     />
   ),
