@@ -15,9 +15,8 @@ export const getAllPosts = async (): Promise<Array<PostType>> => {
     .map((postSlug: string) => {
       const source = fs.readFileSync(
         path.join(root, "content", postSlug),
-        "utf8"
+        "utf8",
       );
-      // console.log(source);
       const parsedFile = matter(source);
 
       return parsedFile.data as PostType;
