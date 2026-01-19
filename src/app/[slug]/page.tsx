@@ -196,10 +196,16 @@ export default async function RemoteMdxPage({
           <h3 className="text-gray-900 font-medium textsm md:text-lg pb-2">
             Continue this discussion
           </h3>
-          <p className="font-sans text-xs md:text-base text-gray-900">
+          <p className="font-sans text-xs md:text-base text-gray-600">
             We&apos;re always happy to speak to people about the work we do at
-            the realm, reach out to us on rndrrealm@gmail.com, looking forward
-            to our conversation.
+            the realm, reach out to us on{" "}
+            <Link
+              href="mailto:rndrrealm@gmail.com"
+              className="font-medium text-gray-900"
+            >
+              rndrrealm@gmail.com
+            </Link>
+            , looking forward to our conversation.
           </p>
         </footer>
       </article>
