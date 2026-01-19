@@ -1,8 +1,7 @@
 import { getAllPosts } from "@/lib/mdx/server-functions";
 
 export async function GET() {
-  const baseUrl =
-    process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
   const posts = await getAllPosts();
 
@@ -27,7 +26,7 @@ export async function GET() {
       <pubDate>${new Date(post.date).toUTCString()}</pubDate>
       <author>rndrrealm@gmail.com (${post.author})</author>
       ${post.category ? `<category>${post.category}</category>` : ""}
-    </item>`
+    </item>`,
       )
       .join("")}
   </channel>

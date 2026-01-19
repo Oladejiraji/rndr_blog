@@ -72,12 +72,12 @@ export default async function RemoteMdxPage({
   const articleSchema = generateArticleSchema(
     post.frontMatter,
     post.frontMatter.readingTime.text,
-    resolvedParams.slug
+    resolvedParams.slug,
   );
 
   const breadcrumbSchema = generateBreadcrumbSchema(
     post.frontMatter.title,
-    resolvedParams.slug
+    resolvedParams.slug,
   );
 
   return (
@@ -193,7 +193,7 @@ export default async function RemoteMdxPage({
           />
         </main>
         <footer className="pt-8 mt-20  pb-20 border-t-2 border-gray-050 ">
-          <h3 className="text-gray-900 font-medium textsm md:text-xl pb-2">
+          <h3 className="text-gray-900 font-medium textsm md:text-lg pb-2">
             Continue this discussion
           </h3>
           <p className="font-sans text-xs md:text-base text-gray-900">
