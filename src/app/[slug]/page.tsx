@@ -99,7 +99,7 @@ export default async function RemoteMdxPage({
       </div>
       <article className="px-5 md:px-0  max-w-174 mx-auto font-sans">
         <div className="py-7">
-          <Link href="/blog" className="inline-block p-2">
+          <Link href="/" className="inline-block p-2">
             <BackIcon />
           </Link>
         </div>
