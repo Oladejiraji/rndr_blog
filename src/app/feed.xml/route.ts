@@ -20,8 +20,8 @@ export async function GET() {
         (post) => `
     <item>
       <title><![CDATA[${post.title}]]></title>
-      <link>${baseUrl}/blog/${post.slug}</link>
-      <guid isPermaLink="true">${baseUrl}/blog/${post.slug}</guid>
+      <link>${baseUrl}/${post.slug}</link>
+      <guid isPermaLink="true">${baseUrl}/${post.slug}</guid>
       <description><![CDATA[${post.description}]]></description>
       <pubDate>${new Date(post.date).toUTCString()}</pubDate>
       <author>rndrrealm@gmail.com (${post.author})</author>

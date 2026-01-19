@@ -3,10 +3,9 @@ import { Post } from "@/types/post";
 export function generateArticleSchema(
   post: Post,
   readingTime: string,
-  slug: string
+  slug: string,
 ) {
-  const baseUrl =
-    process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
   return {
     "@context": "https://schema.org",
@@ -30,7 +29,7 @@ export function generateArticleSchema(
     },
     mainEntityOfPage: {
       "@type": "WebPage",
-      "@id": `${baseUrl}/blog/${slug}`,
+      "@id": `${baseUrl}/${slug}`,
     },
     timeRequired: readingTime,
     articleSection: post.category,
@@ -39,12 +38,8 @@ export function generateArticleSchema(
   };
 }
 
-export function generateBreadcrumbSchema(
-  title: string,
-  slug: string
-) {
-  const baseUrl =
-    process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+export function generateBreadcrumbSchema(title: string, slug: string) {
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
   return {
     "@context": "https://schema.org",
@@ -60,21 +55,20 @@ export function generateBreadcrumbSchema(
         "@type": "ListItem",
         position: 2,
         name: "Blog",
-        item: `${baseUrl}/blog`,
+        item: `${baseUrl}`,
       },
       {
         "@type": "ListItem",
         position: 3,
         name: title,
-        item: `${baseUrl}/blog/${slug}`,
+        item: `${baseUrl}/${slug}`,
       },
     ],
   };
 }
 
 export function generateOrganizationSchema() {
-  const baseUrl =
-    process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
   return {
     "@context": "https://schema.org",
@@ -82,9 +76,7 @@ export function generateOrganizationSchema() {
     name: "RNDR Realm",
     url: baseUrl,
     logo: `${baseUrl}/logo.png`,
-    sameAs: [
-      "https://x.com/rndr_realm",
-    ],
+    sameAs: ["https://x.com/rndr_realm"],
     contactPoint: {
       "@type": "ContactPoint",
       email: "rndrrealm@gmail.com",

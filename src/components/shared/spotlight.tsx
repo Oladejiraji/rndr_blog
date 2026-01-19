@@ -67,7 +67,7 @@ function SearchContent({
               filteredArticles.map((article, i) => (
                 <Link
                   key={i}
-                  href={`/blog/${article.slug}`}
+                  href={`/${article.slug}`}
                   className="flex items-center py-2 px-4 gap-3 hover:bg-gray-50 rounded-lg transition-colors"
                   onClick={onClose}
                 >
@@ -138,7 +138,7 @@ export function Spotlight({ isOpen, onClose, articleData, className }: IProps) {
           side="bottom"
           className={cn(
             "p-0 rounded-t-[20px] space-y-0 gap-0 font-sans h-screen rounded-none",
-            className
+            className,
           )}
         >
           <SheetHeader className="p-0">
@@ -182,7 +182,7 @@ export function Spotlight({ isOpen, onClose, articleData, className }: IProps) {
       <DialogContent
         className={cn(
           "sm:max-w-174 max-w-[425px] p-0 rounded-[20px] space-y-0 gap-0 font-sans top-[20%]! translate-y-0 translate-x-[-50%]!",
-          className
+          className,
         )}
       >
         <DialogHeader>
