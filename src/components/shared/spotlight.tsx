@@ -95,7 +95,7 @@ function SearchContent({
                 </p>
                 <div className="pt-4">
                   <Link
-                    href="mailto:rndrrealm@gmail.com"
+                    href="mailto:hello@rndrealm.com"
                     target="_blank"
                     rel="noopener noreferrer"
                   >

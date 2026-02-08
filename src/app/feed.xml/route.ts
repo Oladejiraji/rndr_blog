@@ -24,7 +24,7 @@ export async function GET() {
       <guid isPermaLink="true">${baseUrl}/${post.slug}</guid>
       <description><![CDATA[${post.description}]]></description>
       <pubDate>${new Date(post.date).toUTCString()}</pubDate>
-      <author>rndrrealm@gmail.com (${post.author})</author>
+      <author>hello@rndrealm.com (${post.author})</author>
       ${post.category ? `<category>${post.category}</category>` : ""}
     </item>`,
       )

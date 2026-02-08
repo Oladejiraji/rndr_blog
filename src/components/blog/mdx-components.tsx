@@ -3,6 +3,7 @@ import SandpackExample from "./sandbox/SandpackExample";
 import SandpackTodoExample from "./sandbox/SandpackTodoExample";
 import SandpackAnimationExample from "./sandbox/SandpackAnimationExample";
 import SandpackReactHooksExample from "./sandbox/SandpackReactHooksExample";
+import SandpackGooeyDropdown from "./sandbox/SandpackGooeyDropdown";
 import Image from "next/image";
 
 const customComponents = {
@@ -10,6 +11,7 @@ const customComponents = {
   SandpackTodoExample,
   SandpackAnimationExample,
   SandpackReactHooksExample,
+  SandpackGooeyDropdown,
   Image,
 };
 
@@ -58,7 +60,9 @@ export const MdxComponents = {
   ),
   a: (props: React.AnchorHTMLAttributes<HTMLAnchorElement>) => (
     <a
-      className="text-xs md:text-sm text-blue-600 hover:text-blue-800 underline"
+      className="text-xs md:text-sm text-inherit underline"
+      target="_blank"
+      rel="noopener noreferrer"
       {...props}
     />
   ),

@@ -57,7 +57,7 @@ const socialOptions = [
       />
     ),
     label: "Mail",
-    href: "mailto:rndrrealm@gmail.com",
+    href: "mailto:hello@rndrealm.com",
   },
 ];
 
@@ -134,8 +134,8 @@ const Blog = async ({
               }
               const href =
                 searchParams.toString() === ""
-                  ? "/blog"
-                  : `/blog?${searchParams.toString()}`;
+                  ? "/"
+                  : `?${searchParams.toString()}`;
               return (
                 <Link
                   key={i}

@@ -111,7 +111,7 @@ export default async function RemoteMdxPage({
           </div>
           <div className="flex items-center gap-2">
             <Link
-              href="mailto:rndrrealm@gmail.com"
+              href="mailto:hello@rndrealm.com"
               target="_blank"
               rel="noopener noreferrer"
               className="size-8 bg-gray-100 rounded-full flex items-center justify-center"
@@ -119,7 +119,7 @@ export default async function RemoteMdxPage({
               <MailIcon />
             </Link>
             <Link
-              href="mailto:rndrrealm@gmail.com"
+              href="mailto:hello@rndrealm.com"
               target="_blank"
               rel="noopener noreferrer"
               className="size-8 bg-gray-100 rounded-full flex items-center justify-center"
@@ -200,10 +200,10 @@ export default async function RemoteMdxPage({
             We&apos;re always happy to speak to people about the work we do at
             the realm, reach out to us on{" "}
             <Link
-              href="mailto:rndrrealm@gmail.com"
+              href="mailto:hello@rndrealm.com"
               className="font-medium text-gray-900"
             >
-              rndrrealm@gmail.com
+              hello@rndrealm.com
             </Link>
             , looking forward to our conversation.
           </p>

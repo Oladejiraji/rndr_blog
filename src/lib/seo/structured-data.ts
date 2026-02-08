@@ -79,7 +79,7 @@ export function generateOrganizationSchema() {
     sameAs: ["https://x.com/rndr_realm"],
     contactPoint: {
       "@type": "ContactPoint",
-      email: "rndrrealm@gmail.com",
+      email: "hello@rndrealm.com",
       contactType: "Customer Service",
     },
   };

@@ -1,0 +1,161 @@
+---
+title: "Gooey Dropdown"
+description: ""
+date: "2026-02-08"
+updated: "2026-2-08"
+author: "Deji"
+slug: "gooey-dropdown"
+category: "motion"
+published: true
+tags: ["article", "featured"]
+---
+
+## Intro
+
+I posted a [dropdown interaction](https://x.com/rndr_realm/status/2018274138201235866?s=20) on Twitter a while back and it got way more attention than I expected. A few people asked how I built it, so I figured I'd write about it.
+
+The idea is pretty simple. You have a button, you click it, a dropdown opens. But instead of it just appearing, the dropdown morphs out of the button with this blobby, gooey effect. Like the two shapes are made of the same liquid.
+
+The whole thing is built with React, Motion and an SVG filter. No canvas, no WebGL, nothing wild. I'll walk through how I built it step by step.
+
+## The basic dropdown
+
+Before any animation or gooey stuff, let's start with the structure. It's a button and a dropdown panel that shows when you click.
+
+```tsx title=Dropdown.tsx
+const Dropdown = () => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div className="relative">
+      <button
+        className="size-13 rounded-full bg-[#1a1a1a] flex items-center justify-center"
+        onClick={() => setIsOpen((prev) => !prev)}
+      >
+        <ChatIcon />
+      </button>
+
+      {isOpen && (
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 translate-y-[70px] w-[340px] bg-[#1a1a1a] rounded-3xl overflow-hidden">
+          <div className="py-3 px-5 flex justify-between items-center">
+            <h1 className="text-white text-lg font-bold">Messages</h1>
+            <p className="text-[#8e8e93] text-xs">3 new</p>
+          </div>
+          {/* message list */}
+        </div>
+      )}
+    </div>
+  );
+};
+```
+
+Nothing fancy here. A `useState` to track if the dropdown is open, a round button that toggles it, and the dropdown panel positioned right below. The dropdown starts at the same `top-0` as the button and gets pushed down with `translate-y` so they overlap vertically. That overlap is important later when we add the gooey filter because the two shapes need to be close enough to blend into each other.
+
+## Animating it
+
+The trick that makes this work is that the dropdown doesn't just fade in. It starts as a small circle, the same size and position as the button, and then expands into the full panel. So it looks like the button itself is stretching open.
+
+To do this I used Motion's `AnimatePresence` and animated the `width`, `height`, `borderRadius` and `y` position of the dropdown. The initial state matches the button exactly: 52px circle, sitting right on top of it.
+
+```tsx title=Dropdown.tsx
+<AnimatePresence>
+  {isOpen && (
+    <motion.div
+      className="absolute top-0 left-1/2 overflow-hidden bg-[#1a1a1a]"
+      initial={{
+        width: 52,
+        height: 52,
+        borderRadius: 26,
+        y: 0,
+        x: "-50%",
+      }}
+      animate={{
+        width: 340,
+        height: 310,
+        borderRadius: 24,
+        y: 70,
+        x: "-50%",
+      }}
+      exit={{
+        width: 52,
+        height: 52,
+        borderRadius: 26,
+        y: 0,
+        x: "-50%",
+      }}
+      transition={{
+        y: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
+        width: { duration: 0.6, delay: 0.1, ease: [0.22, 1, 0.36, 1] },
+        height: { duration: 0.6, delay: 0.1, ease: [0.22, 1, 0.36, 1] },
+        borderRadius: { duration: 0.6, delay: 0.1, ease: [0.22, 1, 0.36, 1] },
+      }}
+    >
+      {/* dropdown content */}
+    </motion.div>
+  )}
+</AnimatePresence>
+```
+
+A couple things to notice here. The `y` position moves first, and then the `width` and `height` follow with a small delay. That stagger is what gives it that organic feel where it slides down and then opens up, instead of everything happening at once. If you animate all the properties at the same time it feels stiff.
+
+The content inside the dropdown also fades in with its own delay so it doesn't show up while the container is still a tiny circle.
+
+```tsx title=Dropdown.tsx
+<motion.div
+  initial={{ opacity: 0 }}
+  animate={{ opacity: 1 }}
+  exit={{ opacity: 0 }}
+  transition={{ duration: 0.3, delay: 0.15, ease: "easeOut" }}
+>
+  {/* messages, header, etc */}
+</motion.div>
+```
+
+At this point you have a dropdown that morphs open and closed smoothly. It already looks pretty good on its own. But adding the gooey filter is what takes it to the next level.
+
+## The gooey effect
+
+This is the part that makes it look like the button and dropdown are melting into each other. It's an SVG filter. I won't go too deep into how SVG filters work (Lucas Bebber has a [great article](https://css-tricks.com/gooey-effect/) on it), but the short version is: you blur everything, then crank up the alpha contrast so the blurry edges snap back to being sharp. Where two shapes are close enough, their blurred edges merge together before snapping back, and that's what creates the gooey blob effect.
+
+Here's the filter:
+
+```html title=gooey-filter.html
+<svg style="position: absolute; width: 0; height: 0;">
+  <defs>
+    <filter id="gooey">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
+      <feColorMatrix
+        in="blur"
+        mode="matrix"
+        values="1 0 0 0 0
+                0 1 0 0 0
+                0 0 1 0 0
+                0 0 0 20 -10"
+        result="gooey"
+      />
+      <feBlend in="SourceGraphic" in2="gooey" />
+    </filter>
+  </defs>
+</svg>
+```
+
+The `stdDeviation="10"` controls how much blur, and the `20 -10` in the last row of the color matrix controls how aggressively the edges snap back. Higher values mean a sharper cutoff, lower values mean more goo. The `feBlend` at the end composites the original sharp graphic back on top so the content inside (text, icons) doesn't look blurry.
+
+Then you just apply it to the parent container that wraps both the button and the dropdown:
+
+```tsx title=Dropdown.tsx
+<div style={{ filter: "url(#gooey)" }}>
+  {/* button */}
+  {/* dropdown */}
+</div>
+```
+
+That's it. Because the button and dropdown are both inside the same filtered container, the filter sees them as one shape and blends their edges together during the animation.
+
+## Putting it all together
+
+Here's the full thing running live. You can toggle the gooey filter on and off to see how much it changes the feel. Try clicking the button with it off first, then turn it on.
+
+<SandpackGooeyDropdown />
+
+The gooey filter is doing a lot of heavy lifting for how little code it is. The animation itself is just moving and resizing a div, but the filter makes it feel like something physical is happening. It's one of those things where a small detail completely changes how the interaction feels.

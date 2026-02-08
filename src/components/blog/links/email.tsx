@@ -7,7 +7,7 @@ const EmailLInk = () => {
   const [isHovered, setIsHovered] = useState(false);
   return (
     <Link
-      href="mailto:rndrrealm@gmail.com"
+      href="mailto:hello@rndrealm.com"
       target="_blank"
       rel="noopener noreferrer"
     >

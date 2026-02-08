@@ -21,7 +21,7 @@ const Code = (preProps: IProps) => {
   const highlightLine = calculateLinesToHighlight(props.metastring);
 
   return (
-    <div className="rounded-[20px] bg-gray-050 font-sans">
+    <div className="rounded-[20px] bg-gray-050 font-sans mb-4">
       <div className="flex items-center justify-between border-b border-gray-1150 px-3 py-3">
         <p className="text-sm text-gray-800">{title}</p>
         <CopyButton codeString={props.codeString} />
@@ -67,7 +67,7 @@ const Code = (preProps: IProps) => {
                               "py-0.5 text-mid",
                               {
                                 "bg-gray-1200": isHighlight,
-                              }
+                              },
                             )}
                           />
                         );
