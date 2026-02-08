@@ -42,7 +42,7 @@ export const metadata: Metadata = {
       "Insights on design, motion, and React development from RNDR Realm creative studio",
     images: [
       {
-        url: "/og.png",
+        url: "/og2.png",
         width: 1200,
         height: 630,
         alt: "RNDR Realm - Creative Studio Blog",

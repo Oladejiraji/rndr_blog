@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/og.png",
+        url: "/og2.png",
         width: 1200,
         height: 630,
         alt: "RNDR Realm Blog",
