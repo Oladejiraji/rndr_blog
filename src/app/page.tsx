@@ -32,7 +32,7 @@ export const metadata: Metadata = {
     title: "Blog | RNDR Realm",
     description:
       "Articles about motion design, React development, interactive components, and creative studio insights",
-    images: ["/og.png"],
+    images: ["/og2.png"],
   },
 };
 

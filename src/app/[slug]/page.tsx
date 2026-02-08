@@ -44,7 +44,7 @@ export async function generateMetadata({
       section: frontMatter.category,
       images: [
         {
-          url: "/og.png",
+          url: "/og2.png",
           width: 1200,
           height: 630,
           alt: frontMatter.title,
@@ -55,7 +55,7 @@ export async function generateMetadata({
       card: "summary_large_image",
       title: frontMatter.title,
       description: frontMatter.description,
-      images: ["/og.png"],
+      images: ["/og2.png"],
     },
   };
 }

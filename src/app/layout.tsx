@@ -55,7 +55,7 @@ export const metadata: Metadata = {
     description:
       "Insights on design, motion, and React development from RNDR Realm creative studio",
     creator: "@rndr_realm",
-    images: ["/og.png"],
+    images: ["/og2.png"],
   },
   robots: {
     index: true,
