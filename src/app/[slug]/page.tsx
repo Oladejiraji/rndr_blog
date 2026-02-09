@@ -6,7 +6,8 @@ import { rehypeFigure } from "@/lib/mdx/rehype-figure";
 import { rehypeMeta } from "@/lib/mdx/rehype-meta";
 import { rehypeSectionize } from "@/lib/mdx/rehype-sectionize-fork";
 import Link from "next/link";
-import { BackIcon, LinkIcon, MailIcon } from "@/components/svg";
+import { BackIcon, MailIcon } from "@/components/svg";
+import { CopyLinkButton } from "@/components/blog/copy-link-button";
 import { MdxComponents } from "@/components/blog/mdx-components";
 import { getAllPosts } from "@/lib/mdx/server-functions";
 import BlogSpotlight from "@/provider/spotlight";
@@ -97,39 +98,47 @@ export default async function RemoteMdxPage({
       <div className="pt-10 pb-11 hidden md:block">
         <BlogSpotlight articleData={articleData} />
       </div>
-      <article className="px-5 md:px-0  max-w-174 mx-auto font-sans">
+      <article className="px-5 md:px-0  max-w-137.5 mx-auto font-sans">
         <div className="py-7">
           <Link href="/" className="inline-block p-2">
             <BackIcon />
           </Link>
         </div>
 
-        <header className="flex justify-between">
-          <div className="font-medium text-base">
-            <h3 className="text-gray-900 ">rndr realm</h3>
-            <p className="text-gray-600">Creative Studio</p>
+        <header className="">
+          <div className="flex justify-between">
+            <div className="font-medium text-base">
+              <Link
+                href="https://rndrealm.com/"
+                target="_blank"
+                rel="noreferrer noopener"
+              >
+                <h3 className="text-gray-900 ">rndr realm</h3>
+              </Link>
+              <p className="text-gray-1300 opacity-40">Creative Studio</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <Link
+                href="mailto:hello@rndrealm.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="size-8 bg-gray-100 rounded-full flex items-center justify-center"
+              >
+                <MailIcon />
+              </Link>
+              <CopyLinkButton />
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <Link
-              href="mailto:hello@rndrealm.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="size-8 bg-gray-100 rounded-full flex items-center justify-center"
-            >
-              <MailIcon />
-            </Link>
-            <Link
-              href="mailto:hello@rndrealm.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="size-8 bg-gray-100 rounded-full flex items-center justify-center"
-            >
-              <LinkIcon />
-            </Link>
-          </div>
+          <p className="text-gray-1300 opacity-40 text-sm mt-8 font-medium">
+            {new Date(post.frontMatter.date).toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+            })}
+          </p>
         </header>
 
-        <main className="pt-4 md:pt-20">
+        <main className="pt-0 ">
           <MDXRemote
             source={post.mdxSource}
             components={MdxComponents}
@@ -193,15 +202,23 @@ export default async function RemoteMdxPage({
           />
         </main>
         <footer className="pt-8 mt-20  pb-20 border-t-2 border-gray-050 ">
-          <h3 className="text-gray-900 font-medium textsm md:text-lg pb-2">
+          <h3 className="text-gray-900  textsm md:text-sm pb-2 tracking-[-0.0056em] leading-5">
             Continue this discussion
           </h3>
-          <p className="font-sans text-xs md:text-base text-gray-600">
+          <p className="font-sans font-medium text-xs md:text-sm text-gray-600 leading-4 md:leading-5 tracking-[-0.0056em]">
             We&apos;re always happy to speak to people about the work we do at
-            the realm, reach out to us on{" "}
+            the{" "}
+            <Link
+              href="https://rndrealm.com/"
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              <span className="underline text-gray-900">realm</span>
+            </Link>
+            , reach out to us on{" "}
             <Link
               href="mailto:hello@rndrealm.com"
-              className="font-medium text-gray-900"
+              className="font-medium text-gray-900 underline"
             >
               hello@rndrealm.com
             </Link>

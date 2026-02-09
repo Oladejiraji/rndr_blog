@@ -165,7 +165,7 @@ export const CopyIcon = () => (
   </svg>
 );
 
-export const TickIcon = () => (
+export const TickIcon = ({ pathClassName }: { pathClassName?: string }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width="12"
@@ -178,6 +178,7 @@ export const TickIcon = () => (
       fillRule="evenodd"
       d="M11.404.256a.875.875 0 0 1 0 1.238L4.846 8.052a.933.933 0 0 1-1.32 0L.267 4.794a.875.875 0 1 1 1.237-1.237l2.681 2.681L10.166.256a.875.875 0 0 1 1.238 0"
       clipRule="evenodd"
+      className={pathClassName}
     ></path>
   </svg>
 );

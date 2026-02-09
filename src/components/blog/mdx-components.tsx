@@ -54,13 +54,13 @@ export const MdxComponents = {
   ),
   p: (props: React.HTMLAttributes<HTMLParagraphElement>) => (
     <p
-      className="text-xs md:text-sm md:leading-6 mb-4 text-gray-700"
+      className="text-xs md:text-sm md:leading-6 font-medium mb-4 text-gray-700"
       {...props}
     />
   ),
   a: (props: React.AnchorHTMLAttributes<HTMLAnchorElement>) => (
     <a
-      className="text-xs md:text-sm text-inherit underline"
+      className="text-xs md:text-sm text-inherit underline font-medium"
       target="_blank"
       rel="noopener noreferrer"
       {...props}
@@ -74,18 +74,18 @@ export const MdxComponents = {
   ),
   ul: (props: React.HTMLAttributes<HTMLUListElement>) => (
     <ul
-      className="text-xs md:text-sm list-disc list-inside mb-4 space-y-2"
+      className="text-xs md:text-sm list-disc list-inside mb-4 space-y-2 font-medium"
       {...props}
     />
   ),
   ol: (props: React.OlHTMLAttributes<HTMLOListElement>) => (
     <ol
-      className="text-xs md:text-sm list-decimal list-inside mb-4 space-y-2"
+      className="text-xs md:text-sm list-decimal list-inside mb-4 space-y-2 font-medium"
       {...props}
     />
   ),
   li: (props: React.LiHTMLAttributes<HTMLLIElement>) => (
-    <li className="text-xs md:text-sm text-gray-700" {...props} />
+    <li className="text-xs md:text-sm text-gray-700 font-medium" {...props} />
   ),
   blockquote: (props: React.BlockquoteHTMLAttributes<HTMLQuoteElement>) => (
     <blockquote
