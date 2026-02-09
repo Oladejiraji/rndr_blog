@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     template: "%s | RNDR Realm",
   },
   description:
-    "Insights on design, motion, and React development from RNDR Realm creative studio",
+    "Insights on design, motion, and from RNDR Realm creative studio",
   keywords: [
     "motion design",
     "react development",
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     siteName: "RNDR Realm",
     title: "RNDR Realm - Creative Studio Blog",
     description:
-      "Insights on design, motion, and React development from RNDR Realm creative studio",
+      "Insights on design, motion, and from RNDR Realm creative studio",
     images: [
       {
         url: "/og2.png",

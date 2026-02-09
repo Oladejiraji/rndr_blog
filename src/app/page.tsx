@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Blog | RNDR Realm",
     description:
-      "Articles about motion design, React development, interactive components, and creative studio insights",
+      "Articles about motion design, interactive components, and creative studio insights",
     type: "website",
     images: [
       {

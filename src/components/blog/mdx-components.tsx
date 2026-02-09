@@ -54,7 +54,7 @@ export const MdxComponents = {
   ),
   p: (props: React.HTMLAttributes<HTMLParagraphElement>) => (
     <p
-      className="text-xs md:text-sm md:leading-6 font-medium mb-4 text-gray-700"
+      className="text-xs md:text-sm leading-5 md:leading-6 font-medium mb-4 text-gray-700"
       {...props}
     />
   ),

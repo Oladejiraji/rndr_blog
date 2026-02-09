@@ -95,9 +95,9 @@ export default async function RemoteMdxPage({
           __html: JSON.stringify(breadcrumbSchema),
         }}
       />
-      <div className="pt-10 pb-11 hidden md:block">
+      {/* <div className="pt-10 pb-11 hidden md:block">
         <BlogSpotlight articleData={articleData} />
-      </div>
+      </div> */}
       <article className="px-5 md:px-0  max-w-137.5 mx-auto font-sans">
         <div className="py-7">
           <Link href="/" className="inline-block p-2">
