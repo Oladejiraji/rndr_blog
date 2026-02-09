@@ -264,9 +264,9 @@ const Sandpack = (props: SandpackProps) => {
         @media (min-width: 880px) {
           .sandpack-wrapper :global(.sp-layout) {
             position: relative;
-            width: calc(100% + 300px);
-            margin-left: -150px;
-            margin-right: -150px;
+            width: calc(100% + 200px);
+            margin-left: -100px;
+            margin-right: -100px;
           }
         }
 

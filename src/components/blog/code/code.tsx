@@ -5,7 +5,7 @@ import {
   preToCodeBlock,
 } from "./utils";
 import * as motion from "motion/react-client";
-import { Highlight, Prism } from "prism-react-renderer";
+import { Highlight } from "prism-react-renderer";
 import { cn } from "@/lib/utils";
 import { codeTheme } from "./theme";
 import { CopyButton } from "./copy-button";
@@ -21,7 +21,7 @@ const Code = (preProps: IProps) => {
   const highlightLine = calculateLinesToHighlight(props.metastring);
 
   return (
-    <div className="rounded-[20px] bg-gray-050 font-sans mb-4">
+    <div className="rounded-[12px] bg-gray-050 font-sans mb-4">
       <div className="flex items-center justify-between border-b border-gray-1150 px-3 py-3">
         <p className="text-sm text-gray-800">{title}</p>
         <CopyButton codeString={props.codeString} />

@@ -6,6 +6,42 @@ import SandpackReactHooksExample from "./sandbox/SandpackReactHooksExample";
 import SandpackGooeyDropdown from "./sandbox/SandpackGooeyDropdown";
 import Image from "next/image";
 
+function Video({
+  src,
+  caption,
+  autoPlay = true,
+  muted = true,
+  loop = true,
+  controls = false,
+  ...props
+}: React.VideoHTMLAttributes<HTMLVideoElement> & { caption?: string }) {
+  const video = (
+    <video
+      src={src}
+      autoPlay={autoPlay}
+      muted={muted}
+      loop={loop}
+      controls={controls}
+      playsInline
+      className="w-full rounded-lg"
+      {...props}
+    />
+  );
+
+  if (caption) {
+    return (
+      <figure className="mb-4">
+        {video}
+        <figcaption className="text-xs text-gray-500 mt-2 text-center">
+          {caption}
+        </figcaption>
+      </figure>
+    );
+  }
+
+  return <div className="mb-4">{video}</div>;
+}
+
 const customComponents = {
   SandpackExample,
   SandpackTodoExample,
@@ -13,42 +49,43 @@ const customComponents = {
   SandpackReactHooksExample,
   SandpackGooeyDropdown,
   Image,
+  Video,
 };
 
 export const MdxComponents = {
   h1: (props: React.HTMLAttributes<HTMLHeadingElement>) => (
     <h1
-      className="text-base md:text-lg font-semibold mb-6 mt-12 text-gray-900"
+      className="text-xs md:text-sm font-semibold mb-6 mt-12 text-gray-900"
       {...props}
     />
   ),
   h2: (props: React.HTMLAttributes<HTMLHeadingElement>) => (
     <h2
-      className="text-sm md:text-base font-semibold mb-4 mt-10 text-gray-900"
+      className="text-xs md:text-sm font-semibold mb-4 mt-10 text-gray-900"
       {...props}
     />
   ),
   h3: (props: React.HTMLAttributes<HTMLHeadingElement>) => (
     <h3
-      className="text-sm md:text-base font-semibold mb-3 mt-8 text-gray-900"
+      className="text-xs md:text-sm font-semibold mb-3 mt-8 text-gray-900"
       {...props}
     />
   ),
   h4: (props: React.HTMLAttributes<HTMLHeadingElement>) => (
     <h4
-      className="text-sm md:text-base font-semibold mb-3 mt-6 text-gray-900"
+      className="text-xs md:text-sm font-semibold mb-3 mt-6 text-gray-900"
       {...props}
     />
   ),
   h5: (props: React.HTMLAttributes<HTMLHeadingElement>) => (
     <h5
-      className="text-sm md:text-base font-semibold mb-2 mt-4 text-gray-900"
+      className="text-xs md:text-sm font-semibold mb-2 mt-4 text-gray-900"
       {...props}
     />
   ),
   h6: (props: React.HTMLAttributes<HTMLHeadingElement>) => (
     <h6
-      className="text-sm md:text-base font-semibold mb-2 mt-4 text-gray-900"
+      className="text-xs md:text-sm font-semibold mb-2 mt-4 text-gray-900"
       {...props}
     />
   ),
@@ -106,7 +143,7 @@ export const MdxComponents = {
   table: (props: React.TableHTMLAttributes<HTMLTableElement>) => (
     <div className="overflow-x-auto mb-4">
       <table
-        className="text-sm md:text-base min-w-full border-collapse border border-gray-300"
+        className="text-xs md:text-sm min-w-full border-collapse border border-gray-300"
         {...props}
       />
     </div>

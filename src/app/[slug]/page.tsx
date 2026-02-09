@@ -10,7 +10,6 @@ import { BackIcon, MailIcon } from "@/components/svg";
 import { CopyLinkButton } from "@/components/blog/copy-link-button";
 import { MdxComponents } from "@/components/blog/mdx-components";
 import { getAllPosts } from "@/lib/mdx/server-functions";
-import BlogSpotlight from "@/provider/spotlight";
 import type { Metadata } from "next";
 import {
   generateArticleSchema,
@@ -115,7 +114,14 @@ export default async function RemoteMdxPage({
               >
                 <h3 className="text-gray-900 ">rndr realm</h3>
               </Link>
-              <p className="text-gray-1300 opacity-40">Creative Studio</p>
+              {/* <p className="text-gray-1300 opacity-40">Creative Studio</p> */}
+              <p className="text-gray-1300 opacity-40 text-sm  font-medium">
+                {new Date(post.frontMatter.date).toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                  year: "numeric",
+                })}
+              </p>
             </div>
             <div className="flex items-center gap-2">
               <Link
@@ -129,13 +135,6 @@ export default async function RemoteMdxPage({
               <CopyLinkButton />
             </div>
           </div>
-          <p className="text-gray-1300 opacity-40 text-sm mt-8 font-medium">
-            {new Date(post.frontMatter.date).toLocaleDateString("en-US", {
-              month: "short",
-              day: "numeric",
-              year: "numeric",
-            })}
-          </p>
         </header>
 
         <main className="pt-0 ">
@@ -154,6 +153,7 @@ export default async function RemoteMdxPage({
                       behavior: "append",
                       properties: {
                         className: ["anchor-link", "space-window-top"],
+                        target: "_self",
                       },
                       content: {
                         type: "element",
@@ -202,10 +202,10 @@ export default async function RemoteMdxPage({
           />
         </main>
         <footer className="pt-8 mt-20  pb-20 border-t-2 border-gray-050 ">
-          <h3 className="text-gray-900  textsm md:text-sm pb-2 tracking-[-0.0056em] leading-5">
+          <h3 className="text-gray-900  text-xs font-medium md:text-sm pb-2 tracking-[-0.0056em] leading-5">
             Continue this discussion
           </h3>
-          <p className="font-sans font-medium text-xs md:text-sm text-gray-600 leading-4 md:leading-5 tracking-[-0.0056em]">
+          <p className="font-sans font-medium text-xs md:text-sm text-gray-600 leading-4 md:leading-5 tracking-[-0.0056em] opacity-40">
             We&apos;re always happy to speak to people about the work we do at
             the{" "}
             <Link
@@ -224,6 +224,16 @@ export default async function RemoteMdxPage({
             </Link>
             , looking forward to our conversation.
           </p>
+          <div className="text-gray-900 text-xs md:text-sm font-medium opacity-40 mt-8 flex flex-col gap-2">
+            <p>Author</p>
+            <Link
+              href="https://x.com/RajiOladeji"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <p className="underline">Oladeji Raji</p>
+            </Link>
+          </div>
         </footer>
       </article>
     </>
