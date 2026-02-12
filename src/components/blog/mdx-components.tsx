@@ -61,13 +61,13 @@ export const MdxComponents = {
   ),
   h2: (props: React.HTMLAttributes<HTMLHeadingElement>) => (
     <h2
-      className="text-xs md:text-sm font-semibold mb-4 mt-10 text-gray-900"
+      className="text-xs md:text-sm font-semibold mb-4 mt-8 text-gray-900"
       {...props}
     />
   ),
   h3: (props: React.HTMLAttributes<HTMLHeadingElement>) => (
     <h3
-      className="text-xs md:text-sm font-semibold mb-3 mt-8 text-gray-900"
+      className="text-xs md:text-sm font-semibold mb-4 mt-8 text-gray-900"
       {...props}
     />
   ),
