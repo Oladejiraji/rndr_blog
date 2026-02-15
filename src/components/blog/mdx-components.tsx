@@ -4,6 +4,8 @@ import SandpackTodoExample from "./sandbox/SandpackTodoExample";
 import SandpackAnimationExample from "./sandbox/SandpackAnimationExample";
 import SandpackReactHooksExample from "./sandbox/SandpackReactHooksExample";
 import SandpackGooeyDropdown from "./sandbox/SandpackGooeyDropdown";
+import SandpackPageTransitionStep1 from "./sandbox/SandpackPageTransitionStep1";
+import SandpackPageTransitionFinal from "./sandbox/SandpackPageTransitionFinal";
 import Image from "next/image";
 
 function Video({
@@ -48,6 +50,8 @@ const customComponents = {
   SandpackAnimationExample,
   SandpackReactHooksExample,
   SandpackGooeyDropdown,
+  SandpackPageTransitionFinal,
+  SandpackPageTransitionStep1,
   Image,
   Video,
 };

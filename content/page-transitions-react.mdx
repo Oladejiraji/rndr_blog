@@ -1,0 +1,424 @@
+---
+title: "Building Smooth Page Transitions in React"
+description: "Learn how to create seamless page transitions with shared element animations using React, Motion, and layout animations"
+date: "2026-02-15"
+updated: "2026-02-15"
+author: "Deji"
+slug: "page-transitions-react"
+category: "motion"
+published: true
+tags: ["article", "featured"]
+---
+
+## Intro
+
+Page transitions can make the difference between a good user experience and a great one. When done right, they create a sense of continuity and help users understand the relationship between different views.
+
+But here's the challenge: implementing smooth transitions between routes in Next.js isn't straightforward. Traditional client-side routing triggers full component unmounts, breaking the animation chain before it even starts. You end up with jarring jumps instead of smooth morphs.
+
+In this article, I'll show you how to build a page transition system that actually works. We'll create a setup where clicking a card smoothly expands it into a full-screen detail view, complete with proper URL changes, browser history support, and shareable links. The trick? **Don't use Next.js routing for the animation itself.**
+
+Instead, we'll use `window.history.pushState` to update the URL imperatively while keeping our components mounted, then add a fallback route for direct links and refreshes. This gives us the best of both worlds: buttery smooth animations that feel native, plus all the benefits of proper routing.
+
+The whole thing is built with React, Motion's layout animations, and some clever state management. Let's break it down step by step.
+
+## Step 1: The Basic Structure
+
+Before any animation magic, we need the core structure: a grid of cards and a modal that displays the selected card in detail.
+
+<SandpackPageTransitionStep1 />
+
+Let's break down each component:
+
+### App Component
+
+The main component manages state and renders the grid of cards plus the modal.
+
+```tsx title=App.tsx
+"use client";
+import { useState } from "react";
+import CardItem from "./CardItem";
+import Modal from "./Modal";
+
+const colors = [
+  { id: 1, color: "oklch(0.982 0.015 295.0)" },
+  { id: 2, color: "oklch(0.942 0.054 295.0)" },
+  { id: 3, color: "oklch(0.886 0.091 295.0)" },
+  { id: 4, color: "oklch(0.780 0.141 295.0)" },
+  { id: 6, color: "oklch(0.594 0.191 295.0)" },
+];
+
+type Color = (typeof colors)[0];
+
+export default function App() {
+  const [selectedItem, setSelectedItem] = useState<Color | null>(null);
+
+  return (
+    <>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+        {colors.map((item) => (
+          <CardItem
+            key={item.id}
+            color={item.color}
+            onClick={() => setSelectedItem(item)}
+          />
+        ))}
+      </div>
+
+      <Modal isOpen={!!selectedItem} onClose={() => setSelectedItem(null)}>
+        <div className="h-full w-full flex flex-col items-center justify-center gap-6 p-4">
+          <div
+            className="max-w-[600px] w-full aspect-[4/3] rounded-lg"
+            style={{ background: selectedItem?.color }}
+          />
+          <button
+            onClick={() => setSelectedItem(null)}
+            className="bg-[#F1F1F1] rounded-[3.125rem] py-2 px-6 text-sm font-medium text-[#C3C3C5] cursor-pointer leading-[1.25rem] tracking-[-0.0056em]"
+          >
+            Home
+          </button>
+        </div>
+      </Modal>
+    </>
+  );
+}
+```
+
+### CardItem Component
+
+A simple button styled with inline background color.
+
+```tsx title=CardItem.tsx
+interface CardItemProps {
+  color: string;
+  onClick: () => void;
+}
+
+export default function CardItem({ color, onClick }: CardItemProps) {
+  return (
+    <button
+      onClick={onClick}
+      style={{ background: color }}
+      className="w-full aspect-[4/3] rounded-lg"
+    />
+  );
+}
+```
+
+### Modal Component
+
+The Modal handles accessibility, focus management, and uses `createPortal` to render outside the normal DOM hierarchy.
+
+```tsx title=Modal.tsx
+import { useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
+
+interface ModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  children: React.ReactNode;
+}
+
+export default function Modal({ isOpen, onClose, children }: ModalProps) {
+  const modalRef = useRef<HTMLDivElement>(null);
+  const previousActiveElement = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      // Store currently focused element
+      previousActiveElement.current = document.activeElement as HTMLElement;
+
+      // Focus the modal
+      modalRef.current?.focus();
+
+      // Prevent body scroll
+      document.body.style.overflow = "hidden";
+    } else {
+      // Restore body scroll
+      document.body.style.overflow = "";
+
+      // Restore focus to previous element
+      previousActiveElement.current?.focus();
+    }
+
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
+
+  if (!isOpen) return null;
+
+  const modalContent = (
+    <div
+      ref={modalRef}
+      className="fixed inset-0 z-50 bg-white"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-title"
+      tabIndex={-1}
+    >
+      {children}
+    </div>
+  );
+
+  return createPortal(modalContent, document.body);
+}
+```
+
+Nothing fancy yet. Just a grid of colored cards that open a modal when clicked. The Modal component handles all the accessibility features: focus management, scroll prevention, and proper ARIA attributes. Inside the modal, we display the selected card in a larger size with a back button to close it. The real magic happens when we add the layout animation.
+
+## Step 2: Shared Layout Animation
+
+This is where Motion's `layoutId` comes in. By giving both the card and the modal content the same `layoutId`, Motion automatically animates between them.
+
+```tsx title=page.tsx {1,6,13,24}
+import { motion } from "motion/react";
+
+interface CardItemProps {
+  color: string;
+  onClick: () => void;
+  layoutId: string;
+}
+
+export function CardItem({ color, onClick, layoutId }: CardItemProps) {
+  return (
+    <motion.button
+      onClick={onClick}
+      layoutId={layoutId}
+      style={{ background: color }}
+      className="w-full aspect-[4/3] rounded-lg"
+    />
+  );
+}
+
+export function Content({ selectedItem, handleGoBack }) {
+  return (
+    <div className="h-full w-full flex flex-col items-center justify-center gap-6 p-4">
+      <motion.div
+        layoutId={selectedItem?.color}
+        style={{ background: selectedItem?.color }}
+        className="max-w-[600px] w-full aspect-[4/3] rounded-lg"
+        transition={{
+          type: "spring",
+          stiffness: 250,
+          damping: 30,
+        }}
+      />
+      <button
+        onClick={handleGoBack}
+        className="bg-[#F1F1F1] rounded-[3.125rem] py-2 px-6 text-sm font-medium text-[#C3C3C5] cursor-pointer"
+      >
+        Home
+      </button>
+    </div>
+  );
+}
+```
+
+The key insight here: **both elements share the same `layoutId`**. When one unmounts and the other mounts, Motion creates a smooth transition between them. It's like they're the same element transforming in place.
+
+## Step 3: URL Integration
+
+For a proper page transition, we need to sync the state with the URL. This way, users can share links, use back/forward buttons, and the experience feels like actual navigation.
+
+```tsx title=page.tsx {6-10,15}
+const handleClick = (data) => {
+  // Update state to trigger animation
+  setSelectedItem(data);
+
+  // Update URL without navigation
+  window.history.pushState({ id: data.id }, "", `/page-transition/${data.id}`);
+};
+
+const handleClose = () => {
+  setSelectedItem(null);
+  window.history.pushState({}, "", `/page-transition`);
+};
+```
+
+We use `pushState` instead of Next.js routing because we want the animation to happen immediately without any page reload or navigation delay. This keeps the animation buttery smooth.
+
+## Step 4: Browser Navigation Support
+
+Users expect the back button to work. We need to listen for `popstate` events and update our state accordingly.
+
+```tsx title=page.tsx
+useEffect(() => {
+  const handlePopState = () => {
+    if (window.location.pathname === "/page-transition") {
+      setSelectedItem(null);
+    } else {
+      const slug = window.location.pathname.split("/page-transition/")[1];
+      const parsed = parseInt(slug);
+      const found = colors.find((color) => color.id === parsed);
+      if (found) {
+        setSelectedItem(found);
+      }
+    }
+  };
+
+  window.addEventListener("popstate", handlePopState);
+  return () => window.removeEventListener("popstate", handlePopState);
+}, []);
+```
+
+Now when users hit back, the modal smoothly animates closed and they return to the grid. Forward button? Works too.
+
+## Step 5: Adding a Fallback Route
+
+When users refresh the page or land directly on a detail URL like `/page-transition/2`, they shouldn't see a 404 error. Instead, we need a fallback route that displays the detail view exactly like the modal would.
+
+Create a dynamic route at `/page-transition/[id]/page.tsx`:
+
+```tsx title=[id]/page.tsx
+"use client";
+import { colors, Content } from "../page";
+import { redirect, useParams, useRouter } from "next/navigation";
+
+export default function Page() {
+  const params = useParams();
+  const router = useRouter();
+  const selectedItem = colors.find((color) => color.id === Number(params.id));
+
+  if (!selectedItem) {
+    redirect("/page-transition");
+  }
+
+  return (
+    <div className="h-screen w-full flex justify-center items-center">
+      <Content
+        selectedItem={selectedItem}
+        handleGoBack={() => router.push("/page-transition")}
+      />
+    </div>
+  );
+}
+```
+
+This route does three important things:
+
+1. **Finds the matching item** - Uses the `id` param to look up the corresponding color from your shared data
+2. **Handles invalid IDs** - Redirects to the grid if the ID doesn't exist
+3. **Reuses the Content component** - Shows exactly the same layout as the modal, maintaining visual consistency
+
+Now when users:
+
+- Refresh the page on `/page-transition/2` → They see the detail view
+- Share a direct link → Recipients see the full detail page
+- Click the back button → They navigate to the grid using Next.js routing
+
+The key difference: navigating from this page to the grid won't have the smooth layout animation since there's no shared element on mount. But that's expected behavior. Animations work best for in-app transitions, not initial page loads.
+
+## Step 6: Polishing the Grid
+
+When a card is selected, we want all the other cards to fade out subtly. This helps focus attention on the animating element.
+
+```tsx title=page.tsx {11-12,14-22}
+export function CardItem({
+  color,
+  onClick,
+  layoutId,
+  isItemSelected = false,
+}: CardItemProps) {
+  return (
+    <motion.button
+      onClick={onClick}
+      layoutId={layoutId}
+      animate={{
+        opacity: isItemSelected ? 0 : 1,
+      }}
+      transition={{
+        type: "spring",
+        stiffness: 250,
+        damping: 30,
+        opacity: {
+          duration: 0.1,
+          delay: isItemSelected ? 0 : 0.225,
+        },
+      }}
+      style={{ background: color }}
+      className="w-full aspect-[4/3] rounded-lg"
+    />
+  );
+}
+```
+
+The key detail: when `isItemSelected` becomes false (user closes modal), we add a delay to the opacity animation. This ensures the layout animation completes before the other cards fade back in. Without this delay, you'd see the cards pop back in while the element is still animating.
+
+## Step 7: Tuning the Spring
+
+Motion's spring animations are powerful, but they need tuning. The default spring might feel too bouncy or too slow.
+
+```tsx title=page.tsx
+transition={{
+  type: "spring",
+  stiffness: 250,
+  damping: 30,
+}}
+```
+
+- **stiffness: 250** - Controls how "tight" the spring is. Higher values make it snap faster.
+- **damping: 30** - Controls how much bounce. Higher values reduce oscillation.
+
+These values create a snappy, responsive feel without being jarring. Experiment with them to find what feels right for your project.
+
+## The Final Result
+
+Here's what we built: a complete page transition system that feels native.
+
+**Core Animation**
+
+- Shared element transitions using Motion's `layoutId`
+- Tuned spring physics for snappy, responsive feel
+- Subtle opacity transitions to guide user focus
+
+**Routing & Navigation**
+
+- URL state management with `pushState` for instant updates
+- Browser back/forward button support with `popstate` listener
+- Fallback route that handles direct links and page refreshes
+- Shareable URLs that actually work
+
+The beauty of this approach is that it's entirely declarative. You're not manually calculating positions or managing complex animation states. Motion's layout animations handle all the heavy lifting.
+
+## Try It Yourself
+
+Here's the complete implementation with all the features we've covered. Click on any card to see the transition, and notice how the URL changes. You can even use the browser's back button to navigate!
+
+<SandpackPageTransitionFinal />
+
+This preview includes:
+
+- Shared layout animations with `layoutId`
+- URL state management with `pushState`
+- Browser back/forward button support
+- Opacity transitions for non-selected cards
+- Tuned spring animations
+- Proper z-index stacking
+
+## See It In Production
+
+Want to see this pattern in action on a real site? Check out [rndrealm.com](https://www.rndrealm.com/) where we use this exact technique for smooth transitions between pages.
+
+<video
+  src="/videos/rndr-transition.mp4"
+  autoPlay
+  loop
+  muted
+  playsInline
+  className="w-full rounded-lg my-8"
+>
+  Your browser does not support the video tag.
+</video>
+
+The same principles apply: shared layout IDs, imperative URL updates, and fallback routes creating transitions that feel cohesive and intentional.
+
+## Wrapping Up
+
+Page transitions don't have to be complicated. The secret to smooth, app-like transitions isn't just the animation. It's how you manage your routes. By using `pushState` instead of full navigation, we keep animations buttery smooth while still maintaining proper URL state for sharing and browser history.
+
+The key insight: **decouple your animations from your routing**. Let Motion handle the visual transitions with `layoutId`, while you control the URL imperatively. Then add a fallback route to catch direct links and refreshes. This three-part system (animated state changes, URL manipulation, and server-side fallbacks) creates an experience that feels native while staying true to the web.
+
+The pattern I showed here works for any list-to-detail transition: product grids, photo galleries, blog post previews, you name it. Just swap out the colored cards for your actual content, set up your dynamic route, and you're good to go.
+
+Try it yourself, experiment with the timing, and see what feels right for your project.
