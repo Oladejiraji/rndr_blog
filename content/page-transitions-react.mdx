@@ -67,11 +67,11 @@ export default function App() {
 
       <Modal isOpen={!!selectedItem} onClose={() => setSelectedItem(null)}>
         <div className="h-full w-full flex flex-col items-center justify-center gap-6 p-4">
-          <div 
+          <div
             className="max-w-[600px] w-full aspect-[4/3] rounded-lg"
-            style={{ background: selectedItem?.color }} 
+            style={{ background: selectedItem?.color }}
           />
-          <button 
+          <button
             onClick={() => setSelectedItem(null)}
             className="bg-[#F1F1F1] rounded-[3.125rem] py-2 px-6 text-sm font-medium text-[#C3C3C5] cursor-pointer leading-[1.25rem] tracking-[-0.0056em]"
           >
@@ -225,13 +225,9 @@ For a proper page transition, we need to sync the state with the URL. This way, 
 const handleClick = (data) => {
   // Update state to trigger animation
   setSelectedItem(data);
-  
+
   // Update URL without navigation
-  window.history.pushState(
-    { id: data.id },
-    "",
-    `/page-transition/${data.id}`
-  );
+  window.history.pushState({ id: data.id }, "", `/page-transition/${data.id}`);
 };
 
 const handleClose = () => {
@@ -306,6 +302,7 @@ This route does three important things:
 3. **Reuses the Content component** - Shows exactly the same layout as the modal, maintaining visual consistency
 
 Now when users:
+
 - Refresh the page on `/page-transition/2` → They see the detail view
 - Share a direct link → Recipients see the full detail page
 - Click the back button → They navigate to the grid using Next.js routing
@@ -317,11 +314,11 @@ The key difference: navigating from this page to the grid won't have the smooth 
 When a card is selected, we want all the other cards to fade out subtly. This helps focus attention on the animating element.
 
 ```tsx title=page.tsx {11-12,14-22}
-export function CardItem({ 
-  color, 
-  onClick, 
+export function CardItem({
+  color,
+  onClick,
   layoutId,
-  isItemSelected = false 
+  isItemSelected = false,
 }: CardItemProps) {
   return (
     <motion.button
@@ -370,11 +367,13 @@ These values create a snappy, responsive feel without being jarring. Experiment 
 Here's what we built: a complete page transition system that feels native.
 
 **Core Animation**
+
 - Shared element transitions using Motion's `layoutId`
 - Tuned spring physics for snappy, responsive feel
 - Subtle opacity transitions to guide user focus
 
 **Routing & Navigation**
+
 - URL state management with `pushState` for instant updates
 - Browser back/forward button support with `popstate` listener
 - Fallback route that handles direct links and page refreshes
@@ -389,6 +388,7 @@ Here's the complete implementation with all the features we've covered. Click on
 <SandpackPageTransitionFinal />
 
 This preview includes:
+
 - Shared layout animations with `layoutId`
 - URL state management with `pushState`
 - Browser back/forward button support
