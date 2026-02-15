@@ -49,6 +49,7 @@ interface PreviewTabsProps {
   selectedTab: Tab;
   onTabSelect: (tab: Tab) => void;
   onClear: () => void;
+  onRefresh: () => void;
   onFullscreen: () => void;
 }
 
@@ -56,6 +57,7 @@ const PreviewTabs = ({
   selectedTab,
   onTabSelect,
   onClear,
+  onRefresh,
   onFullscreen,
 }: PreviewTabsProps) => {
   return (
@@ -83,6 +85,15 @@ const PreviewTabs = ({
         </button>
       </div>
       <div className="flex gap-2">
+        {selectedTab === "preview" && (
+          <button
+            onClick={onRefresh}
+            className="px-2 py-1 text-xs text-gray-600 hover:text-gray-900 transition-colors"
+            title="Refresh preview"
+          >
+            Refresh
+          </button>
+        )}
         {selectedTab === "console" && (
           <button
             onClick={onClear}
@@ -147,6 +158,7 @@ const Sandpack = (props: SandpackProps) => {
   } = props;
 
   const [consoleKey, setConsoleKey] = useState(0);
+  const [previewKey, setPreviewKey] = useState(1);
   const [selectedTab, setSelectedTab] = useState<Tab>(defaultTab);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [savedScrollPosition, setSavedScrollPosition] = useState(0);
@@ -213,7 +225,7 @@ const Sandpack = (props: SandpackProps) => {
           >
             <PreviewTabs
               onFullscreen={handleFullscreen}
-              onClear={() => setConsoleKey(consoleKey + 1)}
+              onRefresh={() => setPreviewKey(previewKey + 1)}
               onTabSelect={(tab) => setSelectedTab(tab)}
               selectedTab={selectedTab}
             />
@@ -228,6 +240,7 @@ const Sandpack = (props: SandpackProps) => {
               }}
             />
             <SandpackPreview
+              key={previewKey}
               showRefreshButton={false}
               showOpenInCodeSandbox={false}
               style={{
