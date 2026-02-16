@@ -227,11 +227,11 @@ export default async function RemoteMdxPage({
           <div className="text-gray-900 text-xs md:text-sm font-medium opacity-40 mt-8 flex flex-col gap-2">
             <p>Author</p>
             <Link
-              href="https://x.com/RajiOladeji"
+              href={post.frontMatter["author-link"] || "https://rndrealm.com/"}
               target="_blank"
               rel="noopener noreferrer"
             >
-              <p className="underline">Oladeji Raji</p>
+              <p className="underline">{post.frontMatter.author}</p>
             </Link>
           </div>
         </footer>
