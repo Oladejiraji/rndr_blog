@@ -60,6 +60,7 @@ export default function App() {
           <CardItem
             key={item.id}
             color={item.color}
+            href={\`/page-transition/\${item.id}\`}
             onClick={() => handleClick(item)}
             layoutId={item.color}
             isItemSelected={
@@ -84,11 +85,20 @@ export default function CardItem({
   color, 
   onClick, 
   layoutId,
+  href,
   isItemSelected = false 
 }) {
+  const handleClick = (e) => {
+    if (!e.metaKey && !e.ctrlKey) {
+      e.preventDefault();
+      onClick();
+    }
+  };
+
   return (
-    <motion.button
-      onClick={onClick}
+    <motion.a
+      href={href}
+      onClick={handleClick}
       layoutId={layoutId}
       style={{ background: color }}
       className="card-item"
@@ -178,9 +188,18 @@ export default function Content({ selectedItem, handleGoBack }) {
           damping: 30,
         }}
       />
-      <button className="back-button" onClick={handleGoBack}>
+      <a
+        href="/page-transition"
+        className="back-button"
+        onClick={(e) => {
+          if (!e.metaKey && !e.ctrlKey) {
+            e.preventDefault();
+            handleGoBack();
+          }
+        }}
+      >
         Home
-      </button>
+      </a>
     </div>
   );
 }`,
@@ -227,6 +246,8 @@ body {
   cursor: pointer;
   position: relative;
   z-index: 1;
+  display: block;
+  text-decoration: none;
 }
 
 .modal {
@@ -269,6 +290,8 @@ body {
   line-height: 1.25rem;
   letter-spacing: -0.0056em;
   transition: opacity 0.2s ease;
+  text-decoration: none;
+  display: inline-block;
 }
 
 .back-button:hover {

@@ -8,7 +8,7 @@ author-link: "https://x.com/shawn_kel"
 slug: "page-transitions-react"
 category: "motion"
 published: true
-hidden: true
+hidden: false
 tags: ["article", "featured"]
 ---
 
@@ -23,6 +23,12 @@ In this article, I'll show you how to build a page transition system that actual
 Instead, we'll use `window.history.pushState` to update the URL imperatively while keeping our components mounted, then add a fallback route for direct links and refreshes. This gives us the best of both worlds: buttery smooth animations that feel native, plus all the benefits of proper routing.
 
 The whole thing is built with React, Motion's layout animations, and some clever state management. Let's break it down step by step.
+
+**Fair warning:** This approach is unconventional. We're deliberately bypassing Next.js's routing system to keep components mounted during transitions. It works beautifully for animations, but it means you're working around the framework's opinions. If you need server-side rendering for every route change or rely heavily on Next.js's data fetching patterns, this might not be the right solution.
+
+**Alternative:** The [View Transitions API](https://developer.mozilla.org/en-US/docs/Web/API/View_Transitions_API) offers a native browser solution for page transitions, though browser support is still evolving and it requires different integration patterns with Next.js.
+
+But if smooth, app-like transitions with full control are your priority? This approach delivers.
 
 ## Step 1: The Basic Structure
 
@@ -62,6 +68,7 @@ export default function App() {
           <CardItem
             key={item.id}
             color={item.color}
+            href={`/page-transition/${item.id}`}
             onClick={() => setSelectedItem(item)}
           />
         ))}
@@ -73,12 +80,18 @@ export default function App() {
             className="max-w-[600px] w-full aspect-[4/3] rounded-lg"
             style={{ background: selectedItem?.color }}
           />
-          <button
-            onClick={() => setSelectedItem(null)}
-            className="bg-[#F1F1F1] rounded-[3.125rem] py-2 px-6 text-sm font-medium text-[#C3C3C5] cursor-pointer leading-[1.25rem] tracking-[-0.0056em]"
+          <a
+            href="/page-transition"
+            onClick={(e) => {
+              if (!e.metaKey && !e.ctrlKey) {
+                e.preventDefault();
+                setSelectedItem(null);
+              }
+            }}
+            className="bg-[#F1F1F1] rounded-[3.125rem] py-2 px-6 text-sm font-medium text-[#C3C3C5] cursor-pointer leading-[1.25rem] tracking-[-0.0056em] no-underline"
           >
             Home
-          </button>
+          </a>
         </div>
       </Modal>
     </>
@@ -88,20 +101,29 @@ export default function App() {
 
 ### CardItem Component
 
-A simple button styled with inline background color.
+We use an anchor element instead of a button for better accessibility and semantics. The cards represent navigation to different pages, so links are more appropriate. We prevent the default navigation behavior (except when Cmd/Ctrl-clicking) to trigger our custom animation instead.
 
 ```tsx title=CardItem.tsx
 interface CardItemProps {
   color: string;
   onClick: () => void;
+  href: string;
 }
 
-export default function CardItem({ color, onClick }: CardItemProps) {
+export default function CardItem({ color, onClick, href }: CardItemProps) {
+  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (!e.metaKey && !e.ctrlKey) {
+      e.preventDefault();
+      onClick();
+    }
+  };
+
   return (
-    <button
-      onClick={onClick}
+    <a
+      href={href}
+      onClick={handleClick}
       style={{ background: color }}
-      className="w-full aspect-[4/3] rounded-lg"
+      className="w-full aspect-[4/3] rounded-lg block"
     />
   );
 }
@@ -173,22 +195,31 @@ Nothing fancy yet. Just a grid of colored cards that open a modal when clicked. 
 
 This is where Motion's `layoutId` comes in. By giving both the card and the modal content the same `layoutId`, Motion automatically animates between them.
 
-```tsx title=page.tsx {1,6,13,24}
+```tsx title=page.tsx {1,7,14,16-22,25}
 import { motion } from "motion/react";
 
 interface CardItemProps {
   color: string;
   onClick: () => void;
   layoutId: string;
+  href: string;
 }
 
-export function CardItem({ color, onClick, layoutId }: CardItemProps) {
+export function CardItem({ color, onClick, layoutId, href }: CardItemProps) {
+  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (!e.metaKey && !e.ctrlKey) {
+      e.preventDefault();
+      onClick();
+    }
+  };
+
   return (
-    <motion.button
-      onClick={onClick}
+    <motion.a
+      href={href}
+      onClick={handleClick}
       layoutId={layoutId}
       style={{ background: color }}
-      className="w-full aspect-[4/3] rounded-lg"
+      className="w-full aspect-[4/3] rounded-lg block"
     />
   );
 }
@@ -206,12 +237,18 @@ export function Content({ selectedItem, handleGoBack }) {
           damping: 30,
         }}
       />
-      <button
-        onClick={handleGoBack}
-        className="bg-[#F1F1F1] rounded-[3.125rem] py-2 px-6 text-sm font-medium text-[#C3C3C5] cursor-pointer"
+      <a
+        href="/page-transition"
+        onClick={(e) => {
+          if (!e.metaKey && !e.ctrlKey) {
+            e.preventDefault();
+            handleGoBack();
+          }
+        }}
+        className="bg-[#F1F1F1] rounded-[3.125rem] py-2 px-6 text-sm font-medium text-[#C3C3C5] cursor-pointer no-underline"
       >
         Home
-      </button>
+      </a>
     </div>
   );
 }
@@ -315,16 +352,25 @@ The key difference: navigating from this page to the grid won't have the smooth 
 
 When a card is selected, we want all the other cards to fade out subtly. This helps focus attention on the animating element.
 
-```tsx title=page.tsx {11-12,14-22}
+```tsx title=page.tsx {5-11,14-15,17-25}
 export function CardItem({
   color,
   onClick,
   layoutId,
+  href,
   isItemSelected = false,
 }: CardItemProps) {
+  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (!e.metaKey && !e.ctrlKey) {
+      e.preventDefault();
+      onClick();
+    }
+  };
+
   return (
-    <motion.button
-      onClick={onClick}
+    <motion.a
+      href={href}
+      onClick={handleClick}
       layoutId={layoutId}
       animate={{
         opacity: isItemSelected ? 0 : 1,
@@ -339,7 +385,7 @@ export function CardItem({
         },
       }}
       style={{ background: color }}
-      className="w-full aspect-[4/3] rounded-lg"
+      className="w-full aspect-[4/3] rounded-lg block"
     />
   );
 }
