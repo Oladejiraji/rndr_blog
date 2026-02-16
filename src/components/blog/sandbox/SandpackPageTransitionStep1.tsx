@@ -28,6 +28,7 @@ export default function App() {
           <CardItem
             key={item.id}
             color={item.color}
+            href={\`/page-transition/\${item.id}\`}
             onClick={() => setSelectedItem(item)}
           />
         ))}
@@ -39,12 +40,18 @@ export default function App() {
             className="modal-content"
             style={{ background: selectedItem?.color }} 
           />
-          <button 
+          <a
+            href="/page-transition"
             className="back-button"
-            onClick={() => setSelectedItem(null)}
+            onClick={(e) => {
+              if (!e.metaKey && !e.ctrlKey) {
+                e.preventDefault();
+                setSelectedItem(null);
+              }
+            }}
           >
             Home
-          </button>
+          </a>
         </div>
       </Modal>
     </>
@@ -53,10 +60,18 @@ export default function App() {
       active: true,
     },
     "/CardItem.js": {
-      code: `export default function CardItem({ color, onClick }) {
+      code: `export default function CardItem({ color, onClick, href }) {
+  const handleClick = (e) => {
+    if (!e.metaKey && !e.ctrlKey) {
+      e.preventDefault();
+      onClick();
+    }
+  };
+
   return (
-    <button
-      onClick={onClick}
+    <a
+      href={href}
+      onClick={handleClick}
       style={{ background: color }}
       className="card-item"
     />
@@ -148,6 +163,8 @@ body {
   border: none;
   cursor: pointer;
   transition: transform 0.2s ease;
+  display: block;
+  text-decoration: none;
 }
 
 .card-item:hover {
@@ -196,6 +213,8 @@ body {
   line-height: 1.25rem;
   letter-spacing: -0.0056em;
   transition: opacity 0.2s ease;
+  text-decoration: none;
+  display: inline-block;
 }
 
 .back-button:hover {
