@@ -10,6 +10,7 @@ export type Post = {
   date: string;
   updated: string;
   author: string;
+  "author-link"?: string;
   slug: string;
   category: string;
   published: boolean;

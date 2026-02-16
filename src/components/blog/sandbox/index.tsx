@@ -226,6 +226,7 @@ const Sandpack = (props: SandpackProps) => {
             <PreviewTabs
               onFullscreen={handleFullscreen}
               onRefresh={() => setPreviewKey(previewKey + 1)}
+              onClear={() => setConsoleKey(consoleKey + 1)}
               onTabSelect={(tab) => setSelectedTab(tab)}
               selectedTab={selectedTab}
             />
