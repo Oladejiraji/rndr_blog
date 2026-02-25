@@ -9,7 +9,6 @@ import Link from "next/link";
 import { BackIcon, MailIcon } from "@/components/svg";
 import { CopyLinkButton } from "@/components/blog/copy-link-button";
 import { MdxComponents } from "@/components/blog/mdx-components";
-import { getAllPosts } from "@/lib/mdx/server-functions";
 import type { Metadata } from "next";
 import {
   generateArticleSchema,
@@ -67,7 +66,6 @@ export default async function RemoteMdxPage({
 }) {
   const resolvedParams = await params;
   const post = await getFileBySlug(resolvedParams.slug);
-  const articleData = await getAllPosts();
 
   const articleSchema = generateArticleSchema(
     post.frontMatter,

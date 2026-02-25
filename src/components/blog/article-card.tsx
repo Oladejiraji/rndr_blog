@@ -18,6 +18,7 @@ const ArticleCard = ({ article }: IProps) => {
       </div>
       <Link
         href={`/${article.slug}`}
+        prefetch={true}
         className="block bg-gray-050 p-4 md:p-8 rounded-[1.25rem]"
       >
         <div className="pb-6 pt-23">
