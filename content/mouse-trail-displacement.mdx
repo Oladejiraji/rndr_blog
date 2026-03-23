@@ -190,7 +190,9 @@ While the radial gradient creates a nice soft circle, you can also use custom im
 const { getTexture, dispose } = useTrailCanvas({
   showCanvas: true,
   image: "https://example.com/brush.png", // Or pass an Image element
-  onResize: () => { /* ... */ },
+  onResize: () => {
+    /* ... */
+  },
 });
 ```
 
