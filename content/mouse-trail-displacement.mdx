@@ -1,0 +1,542 @@
+---
+title: "Interactive Image Displacement with Mouse Trail"
+description: "Learn how to create a dynamic image displacement effect using React Three Fiber, custom shaders, and a canvas-based mouse trail"
+date: "2026-03-23"
+updated: "2026-03-23"
+author: "Stephen"
+author-link: "https://x.com/shawn_kel"
+slug: "mouse-trail-displacement"
+category: "webgl"
+published: true
+tags: ["article", "featured"]
+---
+
+## Intro
+
+I've always been fascinated by displacement effects. There's something satisfying about seeing an image warp and distort in response to your cursor, like you're physically pushing pixels around on the screen.
+
+The effect I'm going to show you combines a few different techniques: a canvas-based mouse trail that tracks your cursor movement, a custom shader that reads that trail as a displacement map, and React Three Fiber to tie it all together. The result is an image that ripples and distorts wherever you move your mouse, creating this organic, fluid interaction.
+
+The whole thing runs at 60fps, works on touch devices, and the code is surprisingly straightforward once you break it down. Let's walk through how it works.
+
+<Video
+  src="/videos/mouse-trail.mp4"
+  caption="Mouse trail displacement effect in action"
+/>
+
+## The Core Idea
+
+Before we dive into code, here's what's happening under the hood:
+
+1. **A hidden canvas** tracks your mouse/touch position and draws a trail that fades over time
+2. **The trail is converted** into a WebGL texture that updates every frame
+3. **A custom shader** reads the brightness of the trail and uses it to displace the image texture
+4. **React Three Fiber** handles the WebGL setup and rendering
+
+The clever part is using the canvas as a data source. Instead of tracking mouse positions in an array or doing displacement calculations in JavaScript, we just paint to a canvas and let the GPU read it directly. The canvas API handles the drawing and fading, and the shader does the displacement. It's fast and the code stays clean.
+
+## Step 1: The Trail Canvas Hook
+
+The first piece we need is a system to track the mouse cursor and paint its trail onto a canvas. This canvas will become our displacement map. I built this as a custom hook that handles everything: canvas creation, event listeners, and the animation loop that fades the trail over time.
+
+### Setting Up the Canvas
+
+The function starts by creating an offscreen canvas that matches your screen's aspect ratio. We don't need full resolution—512px height is plenty for smooth displacement:
+
+```typescript title=useTrailCanvas.ts
+export function useTrailCanvas(props) {
+  const {
+    height = 512,
+    showCanvas = false,
+    image,
+    radius = height * 0.125,
+    softness = 0.5,
+    onResize = () => {},
+  } = props || {};
+
+  const sizes = {
+    screenWidth: window.innerWidth,
+    screenHeight: window.innerHeight,
+  };
+  const aspectRatio = sizes.screenWidth / sizes.screenHeight;
+  const cursorPosition = { x: 9999, y: 9999 };
+  const canvasPosition = { x: 9999, y: 9999 };
+  const previousCursorPosition = { x: 9999, y: 9999 };
+
+  const canvas = document.createElement("canvas");
+  canvas.width = height * aspectRatio;
+  canvas.height = height;
+
+  const ctx = canvas.getContext("2d");
+  ctx.fillStyle = "rgba(0, 0, 0, 1)";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+}
+```
+
+The canvas starts completely black. Black means "no displacement", and white will mean "maximum displacement". We'll paint white circles where the cursor moves. The width is calculated from the aspect ratio so the displacement map matches your screen proportions.
+
+### Tracking Mouse and Touch Events
+
+Next, we need to track where the user's cursor is. We normalize the coordinates to [0, 1] range so they work at any screen size:
+
+```typescript title=useTrailCanvas.ts
+function handleMouseMove(ev) {
+  const x = ev.clientX / sizes.screenWidth;
+  const y = 1 - ev.clientY / sizes.screenHeight;
+
+  cursorPosition.x = x;
+  cursorPosition.y = y;
+  canvasPosition.x = x * canvas.width;
+  canvasPosition.y = (1 - y) * canvas.height;
+}
+
+function handleTouchMove(ev) {
+  ev.preventDefault();
+
+  if (ev.touches.length > 0) {
+    const touch = ev.touches[0];
+    const x = touch.clientX / sizes.screenWidth;
+    const y = 1 - touch.clientY / sizes.screenHeight;
+
+    cursorPosition.x = x;
+    cursorPosition.y = y;
+    canvasPosition.x = x * canvas.width;
+    canvasPosition.y = (1 - y) * canvas.height;
+  }
+}
+
+if (typeof window !== "undefined") {
+  window.addEventListener("mousemove", handleMouseMove);
+  window.addEventListener("touchmove", handleTouchMove, { passive: false });
+  window.addEventListener("touchstart", handleTouchStart, { passive: false });
+  window.addEventListener("resize", handleResize);
+}
+```
+
+We track two sets of coordinates: normalized `cursorPosition` for WebGL and pixel-based `canvasPosition` for drawing. The `{ passive: false }` is important for touch events so we can prevent scrolling.
+
+### The Animation Loop: Fade and Draw
+
+Here's where the magic happens. Every frame, we do two things:
+
+1. **Fade the existing trail** by painting a semi-transparent black rectangle over everything
+2. **Draw a new white circle** at the current cursor position
+
+```typescript title=useTrailCanvas.ts
+let animationFrameId = null;
+let lastTime = performance.now();
+
+function animate(currentTime) {
+  const delta = (currentTime - lastTime) / 1000;
+  lastTime = currentTime;
+
+  ctx.globalCompositeOperation = "source-over";
+  ctx.fillStyle = "#000";
+  ctx.globalAlpha = delta * 3;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  const distance = Math.hypot(
+    canvasPosition.x - previousCursorPosition.x,
+    canvasPosition.y - previousCursorPosition.y,
+  );
+
+  previousCursorPosition.x = canvasPosition.x;
+  previousCursorPosition.y = canvasPosition.y;
+
+  ctx.globalCompositeOperation = "lighten";
+  ctx.globalAlpha = Math.min(1, distance * 0.1);
+
+  const innerRadius = radius * (1 - softness);
+  const gradient = ctx.createRadialGradient(
+    canvasPosition.x,
+    canvasPosition.y,
+    innerRadius,
+    canvasPosition.x,
+    canvasPosition.y,
+    radius,
+  );
+  gradient.addColorStop(0, "rgba(255, 255, 255, 1)");
+  gradient.addColorStop(1, "rgba(255, 255, 255, 0)");
+
+  ctx.beginPath();
+  ctx.arc(canvasPosition.x, canvasPosition.y, radius, 0, Math.PI * 2);
+  ctx.fillStyle = gradient;
+  ctx.fill();
+
+  animationFrameId = requestAnimationFrame(animate);
+}
+
+animationFrameId = requestAnimationFrame(animate);
+```
+
+**Understanding `globalCompositeOperation`**
+
+This is a canvas property that controls how new pixels interact with existing ones. Think of it like Photoshop blend modes.
+
+- **`"source-over"`** (default): The new shape is drawn on top of existing content. We use this for the fade pass because we want the semi-transparent black rectangle to darken everything underneath it. Each frame, this gradually fades the trail to black.
+
+- **`"lighten"`**: Only pixels that are brighter than what's already there get drawn. We use this for drawing the white circles because it means our trails accumulate and build up brightness where they overlap. If we used `"source-over"` instead, new circles would replace old ones instead of adding to them.
+
+The trail opacity is tied to cursor speed. Move fast → brighter trail → stronger displacement. Move slow → fainter trail → subtle displacement.
+
+You can experiment with different blend modes like `"screen"`, `"multiply"`, or `"difference"` to create different trail effects. Read more about [globalCompositeOperation on MDN](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/globalCompositeOperation) or [this visual guide](https://www.w3schools.com/tags/canvas_globalcompositeoperation.asp).
+
+### Using Custom Images as Brushes
+
+While the radial gradient creates a nice soft circle, you can also use custom images as "brushes" for more interesting displacement patterns. The implementation already supports this through the `image` prop:
+
+```typescript title=useTrailCanvas.ts
+// Initialize with an image instead of gradient
+const { getTexture, dispose } = useTrailCanvas({
+  showCanvas: true,
+  image: "https://example.com/brush.png", // Or pass an Image element
+  onResize: () => { /* ... */ },
+});
+```
+
+In the animation loop, when an image is provided, it draws the image instead of the gradient:
+
+```typescript title=useTrailCanvas.ts
+if (loadedImage) {
+  ctx.drawImage(
+    loadedImage,
+    canvasPosition.x - radius,
+    canvasPosition.y - radius,
+    radius * 2,
+    radius * 2,
+  );
+} else {
+  // Fall back to gradient circle
+  const innerRadius = radius * (1 - softness);
+  const gradient = ctx.createRadialGradient(/* ... */);
+  // ... gradient drawing code
+}
+```
+
+You could use noise textures, shapes, symbols, or even emoji as your brush. The brighter parts of the image will create stronger displacement. This opens up creative possibilities:
+
+- **Noise texture**: Creates organic, chaotic displacement
+- **Directional arrow**: Displacement flows in specific directions
+- **Text/logo**: Brand-specific displacement patterns
+- **Particle textures**: Splatter or explosion effects
+
+### Complete Implementation
+
+Here's the full function with cleanup and resize support:
+
+```typescript title=useTrailCanvas.ts
+export function useTrailCanvas(props) {
+  const {
+    height = 512,
+    showCanvas = false,
+    image,
+    radius = height * 0.125,
+    softness = 0.5,
+    onResize = () => {},
+  } = props || {};
+
+  const sizes = {
+    screenWidth: window.innerWidth,
+    screenHeight: window.innerHeight,
+  };
+  const aspectRatio = sizes.screenWidth / sizes.screenHeight;
+  const cursorPosition = { x: 9999, y: 9999 };
+  const canvasPosition = { x: 9999, y: 9999 };
+  const previousCursorPosition = { x: 9999, y: 9999 };
+
+  const canvas = document.createElement("canvas");
+  canvas.width = height * aspectRatio;
+  canvas.height = height;
+
+  const ctx = canvas.getContext("2d");
+  ctx.fillStyle = "rgba(0, 0, 0, 1)";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Event handlers for mouse/touch...
+  // Animation loop...
+
+  function dispose() {
+    if (animationFrameId !== null) {
+      cancelAnimationFrame(animationFrameId);
+    }
+    if (typeof window !== "undefined") {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("touchmove", handleTouchMove);
+      window.removeEventListener("touchstart", handleTouchStart);
+      window.removeEventListener("resize", handleResize);
+    }
+    if (canvas.parentElement) {
+      canvas.parentElement.removeChild(canvas);
+    }
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+
+  return {
+    getTexture: () => canvas,
+    dispose,
+  };
+}
+```
+
+The function returns an object with `getTexture()` to access the canvas and `dispose()` for cleanup when you're done.
+
+## Step 2: Converting Canvas to WebGL Texture
+
+Now we need to get that canvas into Three.js as a texture. In the main component, we call `useTrailCanvas` and create a `CanvasTexture` from it:
+
+```typescript title=page.tsx
+const materialRef = useRef<any>(null);
+const canvasTexture = useRef<CanvasTexture | null>(null);
+
+useEffect(() => {
+  const { getTexture, dispose } = useTrailCanvas({
+    showCanvas: true,
+    onResize: () => {
+      if (canvasTexture.current) {
+        canvasTexture.current.dispose();
+      }
+      canvasTexture.current = new CanvasTexture(getTexture());
+      canvasTexture.current.minFilter = LinearFilter;
+      canvasTexture.current.magFilter = LinearFilter;
+      canvasTexture.current.generateMipmaps = false;
+      canvasTexture.current.needsUpdate = true;
+    },
+  });
+
+  canvasTexture.current = new CanvasTexture(getTexture());
+  canvasTexture.current.minFilter = LinearFilter;
+  canvasTexture.current.magFilter = LinearFilter;
+  canvasTexture.current.generateMipmaps = false;
+
+  return () => {
+    dispose();
+    if (canvasTexture.current) {
+      canvasTexture.current.dispose();
+    }
+  };
+}, []);
+```
+
+The important part is setting `needsUpdate = true` and disabling mipmaps. Since the canvas changes every frame, we need to tell Three.js to re-upload the texture each frame. We'll handle that in `useFrame`:
+
+```typescript title=page.tsx
+useFrame(() => {
+  if (materialRef.current && canvasTexture.current) {
+    materialRef.current.uniforms.uDisplacementTexture.value =
+      canvasTexture.current;
+    materialRef.current.uniforms.uDisplacementTexture.value.needsUpdate = true;
+  }
+});
+```
+
+## Step 3: The Shader Material
+
+This is where the magic happens. We create a custom shader material using `@react-three/drei`'s `shaderMaterial` helper:
+
+```typescript title=page.tsx
+export const CardMaterial = shaderMaterial(
+  {
+    uTexture: null,
+    uDisplacementTexture: null,
+    uResolution: new Vector2(0, 0),
+    uImageResolution: new Vector2(0, 0),
+  },
+  vertexShader,
+  fragmentShader,
+);
+
+extend({ CardMaterial });
+```
+
+The uniforms are straightforward:
+
+- `uTexture` - The image we want to displace
+- `uDisplacementTexture` - Our mouse trail canvas
+- `uResolution` - Screen resolution for UV calculations
+- `uImageResolution` - Image dimensions for proper aspect ratio
+
+### The Vertex Shader
+
+The vertex shader is dead simple. We're doing all the displacement in the fragment shader, so this just passes through UVs:
+
+```glsl title=vertex.glsl
+uniform float uTime;
+
+varying vec2 vUv;
+
+float PI = 3.141592653589793;
+
+void main() {
+  vec3 pos = position;
+
+  vec4 modelPosition = modelMatrix * vec4(vec3(pos), 1.0);
+  vec4 viewPosition = viewMatrix * modelPosition;
+  vec4 projectionPosition = projectionMatrix * viewPosition;
+
+  gl_Position = projectionPosition;
+  vUv = uv;
+}
+```
+
+### The Fragment Shader
+
+This is where displacement happens. We sample the displacement texture, convert its brightness to an angle, and use that to offset our UVs:
+
+```glsl title=fragment.glsl
+uniform sampler2D uTexture;
+uniform sampler2D uDisplacementTexture;
+uniform vec2 uResolution;
+uniform vec2 uImageResolution;
+
+float PI = 3.141592653589793;
+
+varying vec2 vUv;
+
+vec2 CoverUV(vec2 u, vec2 s, vec2 i) {
+  float rs = s.x / s.y; // Aspect screen size
+  float ri = i.x / i.y; // Aspect image size
+  vec2 st = rs < ri ? vec2(i.x * s.y / i.y, s.y) : vec2(s.x, i.y * s.x / i.x);
+  vec2 o = (rs < ri ? vec2((st.x - s.x) / 2.0, 0.0) : vec2(0.0, (st.y - s.y) / 2.0)) / st;
+  return u * s / st + o;
+}
+
+void main() {
+  vec2 coverUv = CoverUV(vUv, uResolution, uImageResolution);
+  vec4 displacement = texture2D(uDisplacementTexture, vUv);
+
+  // Smooth the displacement values
+  displacement = smoothstep(0.1, 1.0, displacement);
+
+  // Convert brightness to angle (0 to 2π)
+  float theta = displacement.r * 2.0 * PI;
+
+  // Create a directional offset
+  vec2 offset = vec2(cos(theta), sin(theta));
+
+  // Apply the displacement
+  coverUv += offset * displacement.r * 0.05;
+
+  vec4 color = texture2D(uTexture, coverUv);
+
+  gl_FragColor = color;
+
+  #include <tonemapping_fragment>
+  #include <colorspace_fragment>
+}
+```
+
+The `CoverUV` function ensures the image fills the screen while maintaining aspect ratio, like CSS `background-size: cover`.
+
+The displacement logic is interesting. We take the red channel (brightness), map it to an angle from 0 to 2π, then use that angle to create a direction vector with `cos` and `sin`. This means brighter parts of the trail push the image in different directions based on the brightness value, creating a swirling, organic displacement instead of just pushing in one direction.
+
+The `smoothstep(0.1, 1.0, displacement)` adds a threshold so very faint parts of the trail don't cause displacement, making the effect cleaner.
+
+### Visualizing the Displacement Texture
+
+Before we apply the displacement, let's see what the displacement texture actually looks like. Move your mouse around in this demo—the white trails you see are what the shader uses to displace the image. Notice how the canvas preview in the top-right corner matches what's displayed:
+
+<SandpackDisplacementVisualization />
+
+This is the raw displacement data. In the next step, we'll use this to distort the actual image.
+
+## Step 4: Putting It Together
+
+Finally, we render a plane that fills the viewport and apply our material:
+
+```typescript title=page.tsx
+function Experience() {
+  const { viewport, size } = useThree((state) => state);
+
+  const materialRef = useRef<any>(null);
+  const canvasTexture = useRef<CanvasTexture | null>(null);
+
+  const texture = useTexture(
+    "https://cdn.cosmos.so/084d20d7-19de-416f-8ab4-a23b7d5efafd?format=jpeg",
+  );
+
+  // Canvas setup and useFrame code from earlier...
+
+  return (
+    <mesh>
+      <planeGeometry args={[viewport.width, viewport.height]} />
+      {/* @ts-ignore */}
+      <cardMaterial
+        ref={materialRef}
+        wireframe={false}
+        uDisplacementTexture={canvasTexture.current}
+        uTexture={texture}
+        uImageResolution={
+          new Vector2(texture.source.data.width, texture.source.data.height)
+        }
+        uResolution={
+          new Vector2(viewport.dpr * size.width, viewport.dpr * size.height)
+        }
+      />
+    </mesh>
+  );
+}
+```
+
+## Touch Support
+
+One thing I'm proud of with this implementation is that touch works seamlessly. The `useTrailCanvas` hook listens for both mouse and touch events:
+
+```typescript title=useTrailCanvas.ts
+function handleTouchMove(ev: TouchEvent) {
+  ev.preventDefault(); // Prevent scrolling while drawing
+
+  if (ev.touches.length > 0) {
+    const touch = ev.touches[0];
+    const x = touch.clientX / sizes.screenWidth;
+    const y = 1 - touch.clientY / sizes.screenHeight;
+
+    cursorPosition.x = x;
+    cursorPosition.y = y;
+    canvasPosition.x = x * canvas.width;
+    canvasPosition.y = (1 - y) * canvas.height;
+  }
+}
+
+window.addEventListener("touchmove", handleTouchMove, { passive: false });
+window.addEventListener("touchstart", handleTouchStart, { passive: false });
+```
+
+The `{ passive: false }` is important because we call `preventDefault()` to stop the page from scrolling while you're drawing. On mobile, you can drag your finger across the screen and watch the image distort in real-time.
+
+## Performance Considerations
+
+This effect is surprisingly performant for what it's doing. The canvas operations are lightweight, and the shader is simple enough that it runs at 60fps on most devices. But there are a few things to keep in mind:
+
+**Canvas resolution:** The canvas is sized by aspect ratio—512px height with width scaled to match your screen. Higher resolution gives more detail in the displacement but costs more in texture upload time.
+
+**Fade speed:** The trail fade rate (`delta * 3`) affects how long the displacement lingers. Faster fade = more responsive but less trailing effect. Tune this to taste.
+
+**Mipmap generation:** We disable mipmaps with `generateMipmaps = false` because the texture updates every frame. Generating mipmaps on each update would tank performance.
+
+## Variations and Experiments
+
+Once you have the basic setup working, there are tons of ways to play with it:
+
+**Different displacement directions:** Instead of using the brightness as an angle, you could displace based on the gradient of the trail (using the trail's direction as the displacement direction).
+
+**Multiple images:** Displace between two images and use the trail to blend between them.
+
+**Custom brush images:** As mentioned earlier, you can pass custom images to `useTrailCanvas` instead of using the radial gradient. Try noise textures for chaotic effects, directional arrows for flow fields, or even text/logos for branded displacement patterns.
+
+**3D displacement:** Do the displacement in the vertex shader instead of fragment shader to actually move the geometry, not just the texture. This creates a relief/emboss effect.
+
+**Color displacement:** Instead of a grayscale trail, use RGB channels to displace in different directions or displace different color channels separately for chromatic aberration.
+
+## Interactive Demo
+
+Here's the full implementation you can play with. Move your mouse around the preview to see the displacement effect in action:
+
+<SandpackMouseTrailDisplacement />
+
+## Wrapping Up
+
+This effect combines a bunch of different web technologies in a way that feels natural once you break it down. Canvas for painting, WebGL for rendering, React for coordination. Each piece does what it's good at.
+
+The nice thing about building effects like this is that the techniques are transferable. The canvas trail could drive audio reactivity, particle systems, or post-processing effects. The shader displacement could respond to video input, webcam data, or generative noise. Once you understand the pipeline, you can plug different sources and effects together.
+
+If you build something with this technique, I'd love to see it. Hit me up on [Twitter](https://x.com/shawn_kel).
